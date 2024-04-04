@@ -30,9 +30,9 @@ export default function Page() {
 
 
    return (
-      <div>
-         <h1>Himay Page</h1>
-         <p>Summoner Level: {summonerLevel}</p>
+      <div className='flex justify-center items-center'>
+         {/* <h1>Himay Page</h1> */}
+         {/* <p>Summoner Level: {summonerLevel}</p> */}
          <MatchSummary />
       </div>
    );

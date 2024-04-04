@@ -1,0 +1,142 @@
+* {
+   box-sizing: border-box;
+}
+
+.match-card-container {
+   width: 644px;
+   display: flex;
+}
+
+.large-match-card-container {
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   border-radius: 6px;
+   width: 100%;
+   height: 100px;
+}
+
+.match-win {
+   background: linear-gradient(0deg, rgba(50, 115, 250, .2), rgba(50, 115, 250, .2)), #191937;
+}
+
+.match-card-content-container {
+   display: flex;
+   align-items: center;
+   width: 100%;
+}
+
+.game-info {
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   height: 100%;
+   width: 91px;
+}
+
+.top-row {
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   height: 19px;
+   margin: 8px 0;
+}
+
+.group-two {
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   width: 94px;
+   margin-left: 6px;
+}
+
+.row-one {
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   height: 46px;
+}
+
+.champion {
+   position: relative;
+   margin-right: 2px;
+}
+
+.champion-face {
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   width: 46px;
+   height: 46px;
+   border-radius: 3px;
+}
+
+.champion-face .image-component {
+   width: 100%;
+   height: 100%;
+   /* transform: scale(1.1); */
+}
+
+.champion-level {
+   position: absolute;
+   bottom: 0;
+   left: 0;
+   width: 16px;
+   border-radius: 3px;
+   background-color: #191937;
+   font-size: 10px;
+   font-weight: 500;
+   text-align: center;
+}
+
+.summoner-spells {
+   display: flex;
+   flex-direction: column;
+   margin-right: 2px;
+}
+
+.summoner-spells .summoner-spell:first-child {
+   margin-bottom: 2px;
+}
+
+.match-summary_desktop .content-container .group-two .row-one .summoner-spells .summoner-spell {
+   width: 22px;
+   height: 22px;
+   border-radius: 3px;
+   background-color: #191937;
+}
+
+
+
+
+
+.summoner {
+   display: flex;
+   flex-direction: row;
+   font-size: 11px;
+}
+
+.item-list {
+   display: flex;
+
+}
+
+.main-item-list {
+   display: grid;
+   grid-template-columns: repeat(3, 1fr);
+   grid-template-rows: repeat(2, 1fr);
+   gap: 2px;
+   justify-content: space-between;
+
+   /* box-sizing: border-box; */
+}
+
+.item {}
+
+.vision-item {}
+
+.team-list {
+   display: flex;
+   flex-direction: column;
+   margin-right: 10px;
+}
