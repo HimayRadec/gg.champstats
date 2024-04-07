@@ -49,7 +49,7 @@
 //    );
 // };
 
-export default function MyPage() {
+export default function Layout() {
    return (
       <div>
          Yo
