@@ -49,10 +49,10 @@
 //    );
 // };
 
-// export function MyPage() {
-//    return (
-//       <div>
-//          <Layout />
-//       </div>
-//    );
-// }
+export default function MyPage() {
+   return (
+      <div>
+         Yo
+      </div>
+   );
+}
