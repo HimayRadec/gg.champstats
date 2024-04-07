@@ -1,54 +1,64 @@
-import '../Champions.css';
+"use client"
 import { useEffect, useState } from 'react';
-import { promises as fs } from 'fs';
 import Image from 'next/image';
 
+export default function Layout() {
+    // Define the Champion interface
+    interface Champion {
+        version: string;
+        id: string;
+        // You can add other properties if needed
+    }
+    
+    // Define the ChampionInfo interface
+    interface ChampionInfo {
+        type: string;
+        format: string;
+        version: string;
+        data: Record<string, Champion>; // Represents an object with string keys and Champion values
+    }
 
-export default async function Layout(){
-    const file = await fs.readFile(process.cwd() + '/src/app/Champions/championData.json', 'utf8');
-    const info = JSON.parse(file);
+    // Declare the state variable with its type
+    const [championId, setChampionId] = useState<string>("");
 
-    const cData = Object.values(info.data)
-    const championId = cData[0].id;
-    // const [searchText, setSearchText] = useState("");
-    // const [championData, setChampionData] = useState("");
-    //const API_KEY = process.env.NEXT_PUBLIC_LEAGUE_API_KEY
-    //console.log(API_KEY)
-    //const APICallString = `https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-name/${searchText}?api_key=${API_KEY}`;
-    // Handle the API call
-    // const response = await fetch(APICallString);
-    // const data = await response.json();
-    // setPlayerData(data);
+    useEffect(() => {
+        // Fetch data when component mounts
+        fetch('https://ddragon.leagueoflegends.com/cdn/14.7.1/data/en_US/champion.json') // Assuming you have an API endpoint serving champion data
+            .then(response => response.json())
+            .then((data: ChampionInfo) => {
+                const championData = Object.values(data.data);
+                setChampionId(championData[0].id); // Set championId state
+            })
+            .catch(error => console.error('Error fetching champion data:', error));
+    }, []);
 
     return (
         <div>
             <div>
-                
                 <input className="search-input-box" type="text" />
                 <button>Search for Champion</button>
             </div>
             <div>
                 <h1 className="Search_Champ">Champions</h1>
                 <div>
-                    <h1>Version: {info.version}</h1>
+                    <h1>Version: {/* Display version here */}</h1>
                     <div>
                         Info
                         <div>
-                            {(cData[0].id)}
+                            {championId}
                         </div>
                         <div className="champion-face">
-                           {/* <Image
-                              src={`https://static.bigbrain.gg/assets/lol/riot_static/14.6.1/img/champion/Nasus.png`}
-                              alt="Nasus from League of Legends"
-                              width={100}
-                              height={100}
-                              className='image-component'
-                           /> */}
+                            <Image
+                                src={`https://static.bigbrain.gg/assets/lol/riot_static/14.6.1/img/champion/${championId}.png`}
+                                alt={`${championId} from League of Legends`}
+                                width={100}
+                                height={100}
+                                className='image-component'
+                            />
                         </div>
                     </div>
                 </div>
             </div>
-
         </div>
-    )
+    );
 }
