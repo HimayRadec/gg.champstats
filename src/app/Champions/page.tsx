@@ -1,13 +1,17 @@
 "use client"
-import { useEffect, useState } from 'react';
-// import 
 
-export default function Layout() {
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
+
+import '../../styles/champion.css'
+
+export default function Champions() {
     // Define the Champion interface
     interface Champion {
         version: string;
         id: string;
-        // You can add other properties if needed
+        name: string;
+        // Add others if needed
     }
     
     // Define the ChampionInfo interface
@@ -19,50 +23,68 @@ export default function Layout() {
     }
 
     // Declare the state variable with its type
-    const [championIds, setChampionIds] = useState<string[]>([]);
+    const [championData, setChampionData] = useState<{ id: string; name: string }[]>([]);
+    const [baseVersion, setBaseVersion] = useState<string>("");
 
     useEffect(() => {
         // Fetch data when component mounts
         fetch('https://ddragon.leagueoflegends.com/cdn/14.7.1/data/en_US/champion.json') // Assuming you have an API endpoint serving champion data
             .then(response => response.json())
             .then((data: ChampionInfo) => {
-                const championIds = Object.keys(data.data);
-                setChampionIds(championIds); // Set championIds state
+                const champions = Object.values(data.data).map(champion => ({
+                    id: champion.id,
+                    name: champion.name
+                }));
+                setChampionData(champions); // Set championData state
+                setBaseVersion(data.version); // Set baseVersion state
             })
             .catch(error => console.error('Error fetching champion data:', error));
     }, []);
 
     return (
         <div>
-            <div>
-                <input className="search-input-box" type="text" />
-                <button>Search for Champion</button>
-            </div>
-            <div>
-                <h1 className="Search_Champ">Champions</h1>
-                <div>
-                    <h1>Version: {/* Display version here */}</h1>
-                    <div>
-                        Info
-                        <div className='champion-container'>
-                            {championIds.map(championId => (
-                                <div key={championId}>
-                                    {championId}
-                                    <div className="champion-face">
-                                        <img
-                                            src={`https://static.bigbrain.gg/assets/lol/riot_static/14.6.1/img/champion/${championId}.png`}
-                                            alt={`${championId} from League of Legends`}
-                                            width={100}
-                                            height={100}
-                                            className='image-component'
-                                        />
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
+          <div className='header'>
+            <input className="search-input-box" type="text" />
+            <button className='search-button'>Search</button>
+          </div>
+          <div>
+            
+            <div className='all-champions'>
+              <div className='champion-header'>
+                <h1 className="champion-info-header">Champions</h1>
+                <div className='champion-header-mini'>
+                  <div>
+                    Click Champion for More Info 
+                  </div>
+                  <div>
+                    Patch: {baseVersion}
+                  </div>
                 </div>
+              </div>
+              <div className='champion-container'>
+                {championData.map(champion => (
+                  <Link key={champion.name} href={`/Champions/${champion.name}`}>
+                      
+                      <div className='champ-name-icon'>
+                        <div className='champ-name'>
+                          {champion.name}
+                        </div>
+                        <div className="champion-face">
+                          <img
+                            src={`https://static.bigbrain.gg/assets/lol/riot_static/14.7.1/img/champion/${champion.id}.png`}
+                            alt={`${champion.name} from League of Legends`}
+                            width={100}
+                            height={100}
+                            className='champion-image'
+                          />
+                        </div>
+                      </div>
+                    
+                  </Link>
+                ))}
+              </div>
             </div>
+          </div>
         </div>
-    );
+      );
 }
