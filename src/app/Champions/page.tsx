@@ -14,7 +14,7 @@ export default function Champions() {
         // Add others if needed
     }
     
-    // Define the ChampionInfo interface
+    // Define the ChampionInfo interface that is from data from api
     interface ChampionInfo {
         type: string;
         format: string;
@@ -28,7 +28,7 @@ export default function Champions() {
 
     useEffect(() => {
         // Fetch data when component mounts
-        fetch('https://ddragon.leagueoflegends.com/cdn/14.7.1/data/en_US/champion.json') // Assuming you have an API endpoint serving champion data
+        fetch('https://ddragon.leagueoflegends.com/cdn/14.7.1/data/en_US/champion.json') 
             .then(response => response.json())
             .then((data: ChampionInfo) => {
                 const champions = Object.values(data.data).map(champion => ({
