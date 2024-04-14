@@ -65,7 +65,13 @@ export default function Champions() {
                     </div>
                     <div className='champion-container'>
                         {championData.map(champion => (
-                            <Link key={champion.name} href={`/Champions/${champion.name}`}>
+                            <Link
+                              key={champion.name}
+                              href={{
+                                pathname: `/Champions/${encodeURIComponent(champion.name)}`,
+                                query: { name: champion.name } // Pass the name prop here
+                              }}
+                            >
                                 <div className='champ-name-icon'>
                                     <div className='champ-name'>
                                         {champion.name}
