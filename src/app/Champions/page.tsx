@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 
-import ChampionImage from '../components/championImage';
+import ChampionImage from '../../components/championImage';
 
 import '../../styles/champion.css';
 
