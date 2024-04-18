@@ -1,0 +1,80 @@
+.login-button{
+    background-color: #3273FA;
+    color: white;
+    padding: 4px 20px;
+    border-radius: 3px;
+    
+}
+.side-nav{
+    background-color: red;
+    width: 90px;
+    height: 100%;
+    position: absolute;
+}
+
+.body{
+    
+    margin-left: 90px;
+    
+}
+header{
+    display: flex;
+    
+}
+
+.col-container{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    text-align: center;
+    width: 1000px;
+    padding-top: 150px;
+    
+}
+.col1{
+    width: 50%;
+    height: 300px;
+    
+}
+.col2{
+    width: 50%;
+    height: 300px;
+    padding-top: 40px;
+}
+.row1{
+    padding: 5px;
+    font-size: 30px;
+    display: flex;
+    flex-direction: row;
+}
+.row2{
+    padding: 10px;
+    color: black;
+    
+}
+.search-home{
+    padding: 10px;
+    width: 80%;
+}
+.row3{
+    padding: 5px;
+    display: flex;
+    justify-content: space-around;
+}
+.lol-image{
+    height: 70px;
+    width: auto;
+    
+}
+.radec-text{
+    width: 70%;
+    text-align: left;
+    padding-left: 25px;
+    padding-top: 15px;
+}
+.row3 img{
+    padding: 10px;
+}
+.lol-cover-image{
+    width: 120px;
+}
