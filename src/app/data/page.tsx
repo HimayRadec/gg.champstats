@@ -8,17 +8,20 @@ export default function Data() {
         matchIdData: null,
         matchData: null
     });
-
+    //Sets which rank i will grab data from
     const gameType = "RANKED_SOLO_5x5";
     const rank = "GOLD";
     const division = "II";
 
+    //All fetches will be completed inside this
     useEffect(() => {
+        //The main fetch for fetching data
         const fetchData = async () => {
             const API_KEY = process.env.NEXT_PUBLIC_LEAGUE_API_KEY ?? '';
             const APICallString = `https://na1.api.riotgames.com/lol/league/v4/entries/${gameType}/${rank}/${division}?page=1&api_key=${API_KEY}`;
 
             try {
+                //fetches the rank data and will store it in response
                 const response = await fetch(APICallString);
                 if (response.ok) {
                     const rankData = await response.json();
@@ -30,6 +33,8 @@ export default function Data() {
                     // Process first summoner if available
                     if (rankData.length > 0) {
                         const selectedSummoner = rankData[2]; // You can choose another index if desired
+
+                        //fetches the summoner 
                         await fetchMatchHistory(selectedSummoner.summonerId, API_KEY);
                     }
                 } else {
