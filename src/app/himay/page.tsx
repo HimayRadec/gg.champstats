@@ -1,5 +1,6 @@
 'use client';
 import MatchSummary from '@/components/MatchSummary';
+import MatchSummaryHeader from '@/components/MatchSummary/MatchSummaryHeader';
 import { useState, useEffect } from 'react';
 
 export default function Page() {
@@ -30,10 +31,8 @@ export default function Page() {
 
 
    return (
-      <div className='flex justify-center items-center'>
-         {/* <h1>Himay Page</h1> */}
-         {/* <p>Summoner Level: {summonerLevel}</p> */}
-         <MatchSummary />
+      <div>
+         <MatchSummaryHeader />
       </div>
    );
 }
