@@ -8,7 +8,7 @@ import { FaBell } from "react-icons/fa";
 
 import "@/styles/MatchSummary.css"
 
-export default function MatchSummaryHeader() {
+export default function SummonerProfileHeader() {
    return (
       <nav className="header">
 

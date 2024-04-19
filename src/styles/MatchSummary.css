@@ -14,7 +14,6 @@
    padding: 10px 20px 10px 0;
    background-color: #070720;
 
-   /* height: fit-content; */
    height: 64px;
    width: 100%
 }
@@ -113,12 +112,12 @@
    width: 64px;
    background-color: #070720;
    color: #a9acd1;
-   transition: 0.5s ease-in-out;
+   transition: 0.1s ease-in-out;
 }
 
 .side-navbar:hover {
    width: 280px;
-   transition: 0.5s ease-in-out;
+   transition: 0.1s ease-in-out;
 }
 
 .game-icon-container {
@@ -160,6 +159,9 @@
 
 /* Profile Summary */
 .profile-summary-container {
-   margin-top: 64px;
-   margin-left: 64px;
+   /* display: grid; */
+   /* grid-template-columns: 324px 1fr; */
+   /* grid-gap: 12px; */
+   border: 1px solid green;
+
 }

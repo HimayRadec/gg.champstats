@@ -1,8 +1,8 @@
 'use client';
 
-import MatchSummaryHeader from '@/components/MatchSummary/MatchSummaryHeader';
+import MatchSummaryHeader from '@/components/SummonerProfile/SummonerProfileHeader';
 import SideNavbar from '@/components/SideNavbar';
-import ProfileSummaryContent from '@/components/MatchSummary/MatchSummaryContent';
+import ProfileSummaryContent from '@/components/SummonerProfile/ProfileSummaryContent';
 import { useState, useEffect } from 'react';
 
 export default function Page() {
@@ -33,11 +33,12 @@ export default function Page() {
 
 
    return (
-      <div className='flex flex-col'>
-         <MatchSummaryHeader />
+      <div className='flex'>
          <div>
             <SideNavbar />
-            <ProfileSummaryContent />
+            <div className='pl-16 w-screen'>
+               <ProfileSummaryContent />
+            </div>
          </div>
       </div>
    );
