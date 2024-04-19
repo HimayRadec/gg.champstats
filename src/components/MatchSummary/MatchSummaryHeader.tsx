@@ -1,3 +1,4 @@
+import Image from 'next/image'
 
 import { MdFeedback } from "react-icons/md";
 import { IoIosSearch } from "react-icons/io";
@@ -11,22 +12,24 @@ export default function MatchSummaryHeader() {
    return (
       <nav className="header">
 
-         <div className="logo-text">ChampStats.gg</div>
+         <div className="">
+            <Image src="/icon.png" alt="ChampStats.gg" width={64} height={64} />
+         </div>
 
          <div className="header-middle">
 
             <div className="header-search-container">
-               <input className="header-search-bar" type="text" placeholder="Search Summoner or Champion w-fit" />
-            </div>
+               <input className="header-search-bar" type="text" placeholder="Search Summoner or Champion" />
 
-            <div className="header-region-selector clickable">
-               <div className="header-region-tag">
-                  NA
+               <div className="header-region-selector clickable">
+                  <div className="header-region-tag">
+                     NA
+                  </div>
                </div>
-            </div>
 
-            <div className="search-button clickable">
-               <IoIosSearch size={22} />
+               <div className="search-button clickable">
+                  <IoIosSearch size={22} />
+               </div>
             </div>
 
          </div>

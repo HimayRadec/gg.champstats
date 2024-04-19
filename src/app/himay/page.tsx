@@ -1,6 +1,8 @@
 'use client';
-import MatchSummary from '@/components/MatchSummary';
+
 import MatchSummaryHeader from '@/components/MatchSummary/MatchSummaryHeader';
+import SideNavbar from '@/components/SideNavbar';
+import ProfileSummaryContent from '@/components/MatchSummary/MatchSummaryContent';
 import { useState, useEffect } from 'react';
 
 export default function Page() {
@@ -31,8 +33,12 @@ export default function Page() {
 
 
    return (
-      <div>
+      <div className='flex flex-col'>
          <MatchSummaryHeader />
+         <div>
+            <SideNavbar />
+            <ProfileSummaryContent />
+         </div>
       </div>
    );
 }
