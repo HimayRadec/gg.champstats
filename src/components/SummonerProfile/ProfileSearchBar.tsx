@@ -60,7 +60,6 @@ function ProfileSearchBar() {
                <IoIosSearch size={22} />
             </button>
          </form>
-         <p>{summonerPUUID}</p>
       </div>
    )
 }
