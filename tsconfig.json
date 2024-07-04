@@ -33,7 +33,7 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "src/app/componentPreview/page.jsx",
-    "src/app/api/riot/getMatch/route.js"
+    "src/app/api/riot/LeagueOfLegends/getMatch/route.js"
   ],
   "exclude": [
     "node_modules"

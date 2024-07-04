@@ -4,8 +4,8 @@ import { IoIosSearch } from "react-icons/io";
 
 
 function ProfileSearchBar() {
-
-   const [summonerName, setSummonerName] = useState("Radec Himay");
+   //TODO: Allow Champion Search by Name
+   const [summonerName, setSummonerName] = useState("");
    const [summonerPUUID, setSummonerPUUID] = useState("None");
    const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
       setSummonerName(e.target.value);
@@ -32,6 +32,7 @@ function ProfileSearchBar() {
       const { gameName, tagLine } = transformSummonerName(summonerName);
 
       window.location.href = `/lol/${gameName}-${tagLine}`;
+      setSummonerName("");
    };
 
    return (
@@ -44,7 +45,7 @@ function ProfileSearchBar() {
             <input
                className="header-search-bar"
                type="text"
-               placeholder="Search Summoner or Champion"
+               placeholder="Game Name#Tag"
                onChange={handleInputChange}
                value={summonerName}
             />

@@ -6,39 +6,50 @@ Overview: This file is the route for the Summoner Page. This file is called when
 Two values are reuqired, the gameName and tagLine of the player.
 Example URL: champstats.gg/lol/radec%20himay-NA1
 */
-'use client'
+'use client';
 
 import { useEffect, useState } from "react";
+import { fetchPUUID } from "@/utils/formatApiData/fetchLeagueOfLegendsData";
 
 export default function Page({ params }: { params: { summoner: string } }) {
    const gameName = params.summoner.split('-')[0];
    const tagLine = params.summoner.split('-')[1];
-   const [puuid, setPuuid] = useState<string | null>(null); // State to hold PUUID
+   const [puuid, setPuuid] = useState<string | null>(null);
+   const [loading, setLoading] = useState<boolean>(true);
+   const [error, setError] = useState<string | null>(null);
 
    useEffect(() => {
-      const fetchPuuid = async () => {
+      const fetchData = async () => {
          try {
-            const res = await fetch(`/api/riot/getAccountPUUID?gameName=${gameName}&tagLine=${tagLine}`);
-            if (!res.ok) {
-               throw new Error(`Failed to fetch PUUID, status ${res.status}`);
-            }
-            const data = await res.json();
-            setPuuid(data.puuid); // Update state with fetched PUUID
-         } catch (error) {
-            console.error('Error fetching PUUID:', error);
-            setPuuid(null); // Reset state to handle error
+            console.log(`Calling fetchPUUID`)
+            const data = await fetchPUUID(gameName, tagLine);
+            setPuuid(data); // Update state with fetched data
+         }
+         catch (error: any) {
+            setError(error.message); // Update state to handle error
+         }
+         finally {
+            setLoading(false); // Update loading state
          }
       };
 
-      fetchPuuid();
+      fetchData();
    }, [gameName, tagLine]);
+
+   if (loading) {
+      return <p>Loading...</p>;
+   }
+
+   if (error) {
+      return <p>{error}</p>;
+   }
 
    return (
       <div>
          <h1>Summoner Page</h1>
          <p>Game Name: {gameName}</p>
          <p>Tag Line: {tagLine}</p>
-         <p>PUUID: {puuid || 'Loading...'}</p> {/* Display 'Loading...' until data is fetched */}
+         <p>PUUID: {puuid}</p> {/* Display fetched PUUID */}
       </div>
    );
 }

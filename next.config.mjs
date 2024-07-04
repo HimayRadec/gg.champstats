@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+   reactStrictMode: false,
    images: {
       domains: ['static.bigbrain.gg'],
       domains: ['ddragon.leagueoflegends.com'],
