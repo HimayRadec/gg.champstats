@@ -9,12 +9,15 @@ Example URL: champstats.gg/lol/radec%20himay-NA1
 'use client';
 
 import { useEffect, useState } from "react";
-import { fetchPUUID } from "@/utils/formatApiData/fetchLeagueOfLegendsData";
+import { fetchPUUID, fetchSummonerProfile } from "@/utils/formatApiData/fetchLeagueOfLegendsData";
 
 export default function Page({ params }: { params: { summoner: string } }) {
    const gameName = params.summoner.split('-')[0];
    const tagLine = params.summoner.split('-')[1];
+
    const [puuid, setPuuid] = useState<string | null>(null);
+   const [summonerProfile, setsummonerProfile] = useState<any | null>(null);
+
    const [loading, setLoading] = useState<boolean>(true);
    const [error, setError] = useState<string | null>(null);
 
@@ -22,14 +25,18 @@ export default function Page({ params }: { params: { summoner: string } }) {
       const fetchData = async () => {
          try {
             console.log(`Calling fetchPUUID`)
-            const data = await fetchPUUID(gameName, tagLine);
-            setPuuid(data); // Update state with fetched data
+            const fetchedPUUIDData = await fetchPUUID(gameName, tagLine);
+            setPuuid(fetchedPUUIDData);
+
+            console.log(`Received PUUID: ${fetchedPUUIDData}`)
+            const fetchedSummonerProfileData = await fetchSummonerProfile(fetchedPUUIDData);
+            setsummonerProfile(fetchedSummonerProfileData);
          }
          catch (error: any) {
-            setError(error.message); // Update state to handle error
+            setError(error.message);
          }
          finally {
-            setLoading(false); // Update loading state
+            setLoading(false);
          }
       };
 
@@ -50,6 +57,7 @@ export default function Page({ params }: { params: { summoner: string } }) {
          <p>Game Name: {gameName}</p>
          <p>Tag Line: {tagLine}</p>
          <p>PUUID: {puuid}</p> {/* Display fetched PUUID */}
+         <p>Summoner Profile: {JSON.stringify(summonerProfile)}</p> {/* Display fetched summoner profile */}
       </div>
    );
 }

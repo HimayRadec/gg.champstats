@@ -8,8 +8,11 @@ The values required are the PUUID of the player. The API key is also required.
 Link to the API: https://developer.riotgames.com/apis#match-v5/GET_getMatchIdsByPUUID
 */
 
-export async function GET(req) {
-   const { searchParams } = new URL(req.url);
+import { type NextRequest } from 'next/server';
+
+
+export async function GET(request: NextRequest) {
+   const { searchParams } = new URL(request.url);
    let puuid = searchParams.get('puuid');
    const apiKey = process.env.RIOT_API_KEY;
 

@@ -5,6 +5,9 @@ import { IoIosSearch } from "react-icons/io";
 
 function ProfileSearchBar() {
    //TODO: Allow Champion Search by Name
+   //TODO: Allow Role Search
+   //TODO: Allow Region Search
+   //TODO: Implement Region Swapping
    const [summonerName, setSummonerName] = useState("");
    const [summonerPUUID, setSummonerPUUID] = useState("None");
    const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -52,6 +55,7 @@ function ProfileSearchBar() {
 
             <div className="header-region-selector clickable">
                <div className="header-region-tag">
+
                   NA
                </div>
             </div>
