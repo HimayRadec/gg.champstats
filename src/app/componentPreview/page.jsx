@@ -1,16 +1,29 @@
 'use client'
-import MatchSummaryCard from '@/components/SummonerProfile/MatchSummaryCard';
-import { matchData as sampleData } from '@/sampleData/formattedRiotAPI';
-
-import { useEffect, useState } from 'react';
+import { fetchAccountByRiotID } from "@/utils/formatApiData/fetchLeagueOfLegendsData";
+import { AccountInformation } from "@/types/LeagueOfLegends";
+import { useEffect, useState } from "react";
 
 export default function MatchDetails() {
+  const [accountData, setAccountData] = useState({
+    puuid: '',
+    gameName: '',
+    tagLine: '',
+  });
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const fetchedAccountData = await fetchAccountByRiotID('radec himay', 'NA1');
+
+      console.log(`fetchedAccountData: ${JSON.stringify(fetchedAccountData)}`);
+      setAccountData(fetchedAccountData);
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <div className='flex flex-col items-center justify-center border'>
-      <MatchSummaryCard matchData={sampleData} summonerIndex={1} />
-      {/* Render match data here */}
-      {/* <pre>{JSON.stringify(matchData, null, 2)}</pre> */}
+      <div>accountData: {JSON.stringify(accountData)}</div>
     </div>
   );
 }

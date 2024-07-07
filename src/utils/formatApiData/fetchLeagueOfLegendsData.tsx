@@ -1,4 +1,13 @@
-// utils/fetchRiotData.ts
+import { AccountInformation } from "@/types/LeagueOfLegends";
+
+type RiotAPIResponse = {
+   data?: any;
+   status: number;
+   error?: string;
+};
+
+
+
 const LeagueAPIRoute = `/api/riot/LeagueOfLegends/`
 
 export async function fetchPUUID(gameName: string, tagLine: string): Promise<any> {
@@ -30,10 +39,23 @@ export async function fetchSummonerProfile(puuid: string): Promise<any> {
       }
 
       const data = await res.json();
-      return data;
+      return data.puuid;
    }
    catch (error: any) {
       console.error('Error fetching data:', error);
+      throw error;
+   }
+}
+
+export async function fetchAccountByRiotID(gameName: string, tagLine: string): Promise<AccountInformation> {
+   try {
+      const response = await fetch(`${LeagueAPIRoute}getAccountByRiotID?gameName=${gameName}&tagLine=${tagLine}`);
+
+      const fetchedData = await response.json();
+      return fetchedData.data;
+   }
+   catch (error: any) {
+      console.error('Error fetching account by Riot ID data:', error);
       throw error;
    }
 }

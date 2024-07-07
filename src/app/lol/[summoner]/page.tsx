@@ -1,47 +1,41 @@
 /*
-Created By Himay on 3/07/2024
-Lasted Edited By: Himay 3/07/2024
+Created By: Himay on 7/03/2024
+Lasted Edited By: Himay 7/03/2024
 File Level: Junior Developer
 Overview: This file is the route for the Summoner Page. This file is called when a user searches for a summoner.
-Two values are reuqired, the gameName and tagLine of the player.
+Two values are required, the gameName and tagLine of the player.
 Example URL: champstats.gg/lol/radec%20himay-NA1
 */
 'use client';
 
 import { useEffect, useState } from "react";
-import { fetchPUUID, fetchSummonerProfile } from "@/utils/formatApiData/fetchLeagueOfLegendsData";
+import { fetchAccountByRiotID } from "@/utils/formatApiData/fetchLeagueOfLegendsData";
+import { AccountInformation } from "@/types/LeagueOfLegends";
+import SummonerProfileComponent from "@/components/SummonerProfile/SummonerProfile";
 
 export default function Page({ params }: { params: { summoner: string } }) {
    const gameName = params.summoner.split('-')[0];
    const tagLine = params.summoner.split('-')[1];
 
-   const [puuid, setPuuid] = useState<string | null>(null);
-   const [summonerProfile, setsummonerProfile] = useState<any | null>(null);
-
+   const [accountData, setAccountData] = useState<AccountInformation | null>(null);
    const [loading, setLoading] = useState<boolean>(true);
    const [error, setError] = useState<string | null>(null);
 
    useEffect(() => {
       const fetchData = async () => {
          try {
-            console.log(`Calling fetchPUUID`)
-            const fetchedPUUIDData = await fetchPUUID(gameName, tagLine);
-            setPuuid(fetchedPUUIDData);
-
-            console.log(`Received PUUID: ${fetchedPUUIDData}`)
-            const fetchedSummonerProfileData = await fetchSummonerProfile(fetchedPUUIDData);
-            setsummonerProfile(fetchedSummonerProfileData);
-         }
-         catch (error: any) {
+            const fetchedAccountData = await fetchAccountByRiotID(gameName, tagLine);
+            setAccountData(fetchedAccountData);  // Set the response data directly to accountData
+         } catch (error: any) {
             setError(error.message);
-         }
-         finally {
+         } finally {
             setLoading(false);
          }
       };
 
       fetchData();
    }, [gameName, tagLine]);
+
 
    if (loading) {
       return <p>Loading...</p>;
@@ -53,11 +47,14 @@ export default function Page({ params }: { params: { summoner: string } }) {
 
    return (
       <div>
-         <h1>Summoner Page</h1>
-         <p>Game Name: {gameName}</p>
-         <p>Tag Line: {tagLine}</p>
-         <p>PUUID: {puuid}</p> {/* Display fetched PUUID */}
-         <p>Summoner Profile: {JSON.stringify(summonerProfile)}</p> {/* Display fetched summoner profile */}
+         {accountData && (
+            <>
+               <p>Game Name: {accountData.gameName}</p>
+               <p>Tag Line: {accountData.tagLine}</p>
+               <p>PUUID: {accountData.puuid}</p>
+               <p>Account Data: {JSON.stringify(accountData)}</p>
+            </>
+         )}
       </div>
    );
 }
