@@ -10,7 +10,7 @@ Link to the API: https://developer.riotgames.com/apis#summoner-v4/GET_getByPUUID
 import { type NextRequest } from 'next/server';
 
 export async function GET(request: NextRequest) {
-   console.log(`Calling Riot API`)
+   console.log(`Calling getSummonerByPUUID API`)
 
    const puuid = request.nextUrl.searchParams.get('puuid');
    const apiKey = process.env.RIOT_API_KEY;
@@ -21,6 +21,7 @@ export async function GET(request: NextRequest) {
 
    try {
       const response = await fetch(`https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/${puuid}?api_key=${apiKey}`);
+      console.log(`https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/${puuid}?api_key=${apiKey}`)
       const data = await response.json();
 
       // Player not found

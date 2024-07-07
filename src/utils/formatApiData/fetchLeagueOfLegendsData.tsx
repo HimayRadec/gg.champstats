@@ -1,4 +1,4 @@
-import { AccountInformation } from "@/types/LeagueOfLegends";
+import { AccountInformation, SummonerProfile } from "@/types/LeagueOfLegends";
 
 type RiotAPIResponse = {
    data?: any;
@@ -29,17 +29,20 @@ export async function fetchPUUID(gameName: string, tagLine: string): Promise<any
    }
 }
 
-export async function fetchSummonerProfile(puuid: string): Promise<any> {
-   try {
-      const res = await fetch(`${LeagueAPIRoute}getSummonerByPUUID?puuid=${puuid}`);
 
-      if (res.status === 404) {
-         const errorData = await res.json();
+// Fetches the SummonerProfile data using the PUUID
+export async function fetchSummonerProfile(puuid: string): Promise<SummonerProfile> {
+   try {
+      const response = await fetch(`${LeagueAPIRoute}getSummonerByPUUID?puuid=${puuid}`);
+
+      // If the PUUID is invalid
+      if (response.status === 404) {
+         const errorData = await response.json();
          throw new Error(`Invalid PUUID: ${errorData.error}`);
       }
 
-      const data = await res.json();
-      return data.puuid;
+      const fetchedData = await response.json();
+      return fetchedData.data;
    }
    catch (error: any) {
       console.error('Error fetching data:', error);
@@ -47,6 +50,7 @@ export async function fetchSummonerProfile(puuid: string): Promise<any> {
    }
 }
 
+// Fetches the AccountInformation using the game name and tag line
 export async function fetchAccountByRiotID(gameName: string, tagLine: string): Promise<AccountInformation> {
    try {
       const response = await fetch(`${LeagueAPIRoute}getAccountByRiotID?gameName=${gameName}&tagLine=${tagLine}`);
