@@ -1,6 +1,6 @@
 /*
 Created By: Himay on 7/03/2024
-Lasted Edited By: Himay 7/03/2024
+Lasted Edited By: Himay 7/12/2024
 File Level: Junior Developer
 Overview: This file is the route for the Summoner Page. This file is called when a user searches for a summoner.
 Two values are required, the gameName and tagLine of the player.
@@ -9,6 +9,9 @@ Example URL: champstats.gg/lol/radec%20himay-NA1
 'use client';
 
 //TODO: Figure out a way to stop the match summary card from re-rendering every time the page is refreshed
+//TODO: Add a loading spinner for the match summary card
+//TODO: Add a 404 page for when the summoner is not found
+//TODO: Only fetch 10 match ids at a time
 
 import { useEffect, useState } from "react";
 import { fetchAccountByRiotID, fetchMatchIdsByPUUID } from "@/utils/formatApiData/fetchLeagueOfLegendsData";
@@ -59,10 +62,10 @@ export default function Page({ params }: { params: { summoner: string } }) {
       <div className="flex flex-col items-center">
          {accountData && (
             <>
-               <SummonerProfileComponent accountData={accountData} />
-               <p>PUUID: {accountData.puuid}</p>
+               <div className="mb-2">
+                  <SummonerProfileComponent accountData={accountData} />
+               </div>
                <div>
-                  matches:
                   <MatchSummaryCard matchId={matchIds[0]} puuid={accountData.puuid} />
                   {matchIds?.map((matchId) => (
                      <div key={matchId}>

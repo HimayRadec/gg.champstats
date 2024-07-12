@@ -1,6 +1,6 @@
 /*
 Created By: Himay on 5/15/2024?
-Last Edited By: Himay on 5/17/2024
+Last Edited By: Himay on 7/12/2024
 Overview: This component is a card that displays a summary of a match that the summoner has played. 
 It displays information such as the game duration, the summoner's KDA, the summoner's champion, the summoner's items, and the summoner's teammates. 
 The card can be expanded to display more detailed information about the match, such as the summoner's damage dealt, gold earned, CS, wards placed, and items purchased. 
@@ -22,7 +22,11 @@ Parent Component:
 
 */
 
-//TOOD: Add Tooltip for summoner spells and runes https://mui.com/material-ui/react-tooltip/
+//TOOD: Add Tooltip for summoner spells, runes and champions https://mui.com/material-ui/react-tooltip/
+//TODO: Correctly Assign Blue and Red Side
+//TODO: Add Rank and LP to the card
+//TODO: Calculate LP Gain/Loss
+
 
 'use client'
 import Image from 'next/image'
@@ -30,7 +34,6 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { fetchMatchByMatchID, fetchSummonerSpellsData, fetchRunesData } from '@/utils/formatApiData/fetchLeagueOfLegendsData';
 import { MatchInformation, ParticipantInformation, SummonerSpells, SummonerSpell, PerkData, Perk, RuneSlot, Rune } from '@/types/LeagueOfLegends';
-import { json } from 'stream/consumers';
 
 const WIN_BACKGROUND_COLOR = '#12264a';
 const LOSS_BACKGROUND_COLOR = '#5e1515';
