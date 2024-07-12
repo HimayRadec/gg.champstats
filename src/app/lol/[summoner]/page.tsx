@@ -8,10 +8,13 @@ Example URL: champstats.gg/lol/radec%20himay-NA1
 */
 'use client';
 
+//TODO: Figure out a way to stop the match summary card from re-rendering every time the page is refreshed
+
 import { useEffect, useState } from "react";
-import { fetchAccountByRiotID } from "@/utils/formatApiData/fetchLeagueOfLegendsData";
+import { fetchAccountByRiotID, fetchMatchIdsByPUUID } from "@/utils/formatApiData/fetchLeagueOfLegendsData";
 import { AccountInformation } from "@/types/LeagueOfLegends";
 import SummonerProfileComponent from "@/components/SummonerProfile/SummonerProfile";
+import { MatchSummaryCard } from "@/components/SummonerProfile/MatchSummaryCard";
 
 export default function Page({ params }: { params: { summoner: string } }) {
    const gameName = params.summoner.split('-')[0];
@@ -26,10 +29,16 @@ export default function Page({ params }: { params: { summoner: string } }) {
       const fetchData = async () => {
          try {
             const fetchedAccountData: AccountInformation = await fetchAccountByRiotID(gameName, tagLine);
-            setAccountData(fetchedAccountData);  // Set the response data directly to accountData
-         } catch (error: any) {
+            setAccountData(fetchedAccountData);
+
+            const fetchedMatchIds: string[] = await fetchMatchIdsByPUUID(fetchedAccountData.puuid);
+            setMatchIds(fetchedMatchIds);
+
+         }
+         catch (error: any) {
             setError(error.message);
-         } finally {
+         }
+         finally {
             setLoading(false);
          }
       };
@@ -51,12 +60,19 @@ export default function Page({ params }: { params: { summoner: string } }) {
          {accountData && (
             <>
                <SummonerProfileComponent accountData={accountData} />
-               <p>Game Name: {accountData.gameName}</p>
-               <p>Tag Line: {accountData.tagLine}</p>
                <p>PUUID: {accountData.puuid}</p>
-               <p>Account Data: {JSON.stringify(accountData)}</p>
+               <div>
+                  matches:
+                  <MatchSummaryCard matchId={matchIds[0]} puuid={accountData.puuid} />
+                  {matchIds?.map((matchId) => (
+                     <div key={matchId}>
+                        <p>{matchId}</p>
+                     </div>
+                  ))}
+               </div>
             </>
          )}
       </div>
    );
+
 }

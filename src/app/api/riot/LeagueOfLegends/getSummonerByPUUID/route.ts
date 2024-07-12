@@ -1,16 +1,16 @@
 /* 
-Created By Himay on 5/21/2024
-Lasted Edited By: Himay 5/21/2024
+Created By: Himay on 5/21/2024
+Lasted Edited By: Himay 7/07/2024
 File Level: Junior Developer
 Overview: Gets summoner information using their PUUID. 
-Example URL: /api/riot/getAccountPUUID?gameName=radec%20himay&tagLine=NA1 TODO: Update this URL
+Example URL: /api/riot/LeagueOfLegends/getAccountPUUID?gameName=radec%20himay&tagLine=NA1 
 
 Link to the API: https://developer.riotgames.com/apis#summoner-v4/GET_getByPUUID
 */
+
 import { type NextRequest } from 'next/server';
 
 export async function GET(request: NextRequest) {
-   console.log(`Calling getSummonerByPUUID API`)
 
    const puuid = request.nextUrl.searchParams.get('puuid');
    const apiKey = process.env.RIOT_API_KEY;
@@ -21,20 +21,24 @@ export async function GET(request: NextRequest) {
 
    try {
       const response = await fetch(`https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/${puuid}?api_key=${apiKey}`);
-      console.log(`https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/${puuid}?api_key=${apiKey}`)
       const data = await response.json();
 
       // Player not found
       if (data.status && data.status.status_code === 404) return new Response(JSON.stringify({ error: 'Player not found' }), { status: 404 });
 
-      return new Response(JSON.stringify({ data }), { status: 200 });
+      return new Response(JSON.stringify(
+         { data }),
+         { status: 200 }
+      );
    }
    catch (error) {
       console.error('Error fetching PUUID:', error);
 
       // Invalid API URL
-      return new Response(JSON.stringify({ error: 'Invalid API URL' }), { status: 500 });
+      return new Response(JSON.stringify(
+         { error: 'Invalid API URL' }),
+         { status: 500 }
+      );
    }
-
 }
 

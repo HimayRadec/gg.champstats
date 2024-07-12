@@ -33,3 +33,8 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 
 The project is deployed on vercel and the url is found here
 https://gg-champstats.vercel.app/
+
+## TODO
+automatically update runes from this site 
+https://ddragon.leagueoflegends.com/cdn/14.13.1/data/en_US/runesReforged.json
+don't forget to make the patch update also

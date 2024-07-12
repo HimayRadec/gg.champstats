@@ -13,7 +13,6 @@ function SummonerProfileComponent(props: { accountData: AccountInformation }) {
       const fetchData = async () => {
          try {
             const fetchedSummonerProfileData: SummonerProfile = await fetchSummonerProfile(props.accountData.puuid);
-            console.log(`fetchedSummonerProfileData: ${JSON.stringify(fetchedSummonerProfileData, null, 2)}`);
             setSummonerProfileData(fetchedSummonerProfileData);
          }
          catch (error: any) {

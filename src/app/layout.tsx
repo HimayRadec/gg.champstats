@@ -19,7 +19,7 @@ export default function RootLayout({
   return (
     <html lang="en">
 
-      <body className={`${inter.className} min-h-screen border`}>
+      <body className={`${inter.className} min-h-screen`}>
         <div className="h-16">
           <SummonerProfileHeader />
         </div>
