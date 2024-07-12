@@ -56,7 +56,7 @@ export default function Page({ params }: { params: { summoner: string } }) {
    }
 
    return (
-      <div>
+      <div className="flex flex-col items-center">
          {accountData && (
             <>
                <SummonerProfileComponent accountData={accountData} />

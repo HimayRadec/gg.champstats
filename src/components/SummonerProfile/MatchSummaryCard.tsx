@@ -53,7 +53,7 @@ function ChampionIcon(props: { championName: string }) {
 function SummonerSpellIcon(props: { summonerSpell: SummonerSpell }) {
    const { summonerSpell: summonerSpellData } = props;
    if (!summonerSpellData) return null;
-
+   console.log('[SummonerSpellIcon] summonerSpellData:', summonerSpellData);
    return (
       <div
          className='SummonerSpellIcon relative h-full w-full'
@@ -466,7 +466,7 @@ export function MatchSummaryCard(props: { matchId: string, puuid: string }) {
             </div>
 
          </div>
-         <div className={`flex flex-col ${isExpanded ? '' : 'hidden'}`} style={{ backgroundColor: backgroundColor }}>
+         {/* <div className={`flex flex-col ${isExpanded ? '' : 'hidden'}`} style={{ backgroundColor: backgroundColor }}>
             <ExpandedTeamOverview
                participantsData={[
                   matchData!.info.participants[0],
@@ -487,7 +487,7 @@ export function MatchSummaryCard(props: { matchId: string, puuid: string }) {
                ]}
                highestDamageInGame={highestDamageInGame!}
             />
-         </div>
+         </div> */}
       </div>
    )
 }
