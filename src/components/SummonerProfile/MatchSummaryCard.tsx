@@ -25,15 +25,54 @@ Parent Component:
 //TOOD: Add Tooltip for summoner spells and runes https://mui.com/material-ui/react-tooltip/
 
 'use client'
-import { useEffect, useState } from 'react';
 import Image from 'next/image'
-import { SummonerInfo } from '@/types/MatchSummary';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
 import { fetchMatchByMatchID, fetchSummonerSpellsData, fetchRunesData } from '@/utils/formatApiData/fetchLeagueOfLegendsData';
-import { MatchInformation, SummonerSpells, SummonerSpell, PerkData, Perk, RuneSlot, Rune } from '@/types/LeagueOfLegends';
+import { MatchInformation, ParticipantInformation, SummonerSpells, SummonerSpell, PerkData, Perk, RuneSlot, Rune } from '@/types/LeagueOfLegends';
 import { json } from 'stream/consumers';
 
 const WIN_BACKGROUND_COLOR = '#12264a';
 const LOSS_BACKGROUND_COLOR = '#5e1515';
+
+function getSummonerSpellByKey(summonerSpellsData: SummonerSpells, summonerSpellKey: number): SummonerSpell | undefined {
+   for (const spellKey in summonerSpellsData.data) {
+      if (summonerSpellsData.data[spellKey].key === summonerSpellKey.toString()) {
+         return summonerSpellsData.data[spellKey];
+      }
+   }
+   return undefined;
+}
+
+
+// TODO: Lower runtime complexity? Doesnt really matter since the data is small but still good practice.
+// Returns Specific Runes. Example: Arcane Comet, Electrocute, Conqueror, etc.
+function findRune(runesData: PerkData, perkId: number, slotIndex: number, runeId: number): Rune | undefined {
+
+   const perk = runesData!.find(p => p.id === perkId);
+
+   if (perk && perk.slots[slotIndex]) {
+      return perk.slots[slotIndex].runes.find(r => r.id === runeId);
+   }
+   return undefined;
+}
+
+
+// Returns Run Tree Names. Example: Sorcery, Domination, Precision, etc.
+function findPerk(runesData: PerkData, perkId: number): Perk | undefined {
+   return runesData?.find(perk => perk.id === perkId);
+}
+
+
+function calculateDamagePercentage(totalDamageDealtToChampions: number, highestDamageInGame: number): string {
+   const percentage = (totalDamageDealtToChampions / highestDamageInGame) * 100;
+   const roundedPercentage = Math.round(percentage);
+   return `${roundedPercentage}%`;
+}
+
+
+
+/***                    React Components                    ***/
 
 function ChampionIcon(props: { championName: string }) {
    const { championName } = props;
@@ -53,7 +92,7 @@ function ChampionIcon(props: { championName: string }) {
 function SummonerSpellIcon(props: { summonerSpell: SummonerSpell }) {
    const { summonerSpell: summonerSpellData } = props;
    if (!summonerSpellData) return null;
-   console.log('[SummonerSpellIcon] summonerSpellData:', summonerSpellData);
+
    return (
       <div
          className='SummonerSpellIcon relative h-full w-full'
@@ -69,6 +108,7 @@ function SummonerSpellIcon(props: { summonerSpell: SummonerSpell }) {
       </div>
    );
 }
+
 
 function PrimaryRuneIcon(props: { rune: Rune }) {
    const { rune } = props;
@@ -87,6 +127,7 @@ function PrimaryRuneIcon(props: { rune: Rune }) {
    );
 }
 
+
 function SecondaryPerkIcon(props: { perk: Perk }) {
    const { perk } = props;
    if (!perk) return null;
@@ -104,10 +145,11 @@ function SecondaryPerkIcon(props: { perk: Perk }) {
    );
 }
 
-function ItemIcon(props: { itemId: string }) {
+
+function ItemIcon(props: { itemId: number }) {
    const { itemId } = props;
 
-   if (itemId === '0') {
+   if (itemId.toString() === '0') {
       return (
          <div className='ItemIcon bg-white bg-opacity-5 h-full w-full'>
          </div>
@@ -127,6 +169,7 @@ function ItemIcon(props: { itemId: string }) {
    }
 }
 
+
 function ParticipantChampionIconAndSummonerName(props: { championName: string, summonerName: string }) {
    const { championName, summonerName } = props;
    return (
@@ -141,38 +184,49 @@ function ParticipantChampionIconAndSummonerName(props: { championName: string, s
    );
 }
 
-function ExpandedParticipantInfo(props: { participantStats: any, highestDamageInGame: number }) {
 
-   const { participantStats, highestDamageInGame } = props;
-   function calculateDamagePercentage(highestDamageInGame: number): string {
-      const percentage = (participantStats.totalDamageDealtToChampions / highestDamageInGame) * 100;
-      const roundedPercentage = Math.round(percentage);
-      return `${roundedPercentage}%`;
-   }
-
+function ExpandedParticipantInfo(props: {
+   participantStats: ParticipantInformation,
+   runesData: PerkData,
+   summonerSpellsData: SummonerSpells
+   highestDamageInGame: number
+}) {
+   const { participantStats, runesData, summonerSpellsData, highestDamageInGame } = props;
 
    return (
       <div className='ExpandedParticipantInfo grid grid-cols-8 h-[36px]'>
 
          <div className='LoadoutIconsColumn flex col-span-2'>
+
             <div className='grid grid-cols-4 grid-rows-2 w-[76px] gap-1'>
                <div className='col-span-2 row-span-2'>
                   <ChampionIcon championName={participantStats.championName} />
                </div>
-
-               {/* 
-               TODO:
-               - implement a function that maps the summoner spell names to their respective icons
-               - implement a function that maps the rune names to their respective icons
-               */}
-               <SummonerSpellIcon summonerSpell='SummonerExhaust' />
-               <PrimaryRuneIcon runeName='ArcaneComet' runeTreeName='Sorcery' />
-               <SummonerSpellIcon summonerSpell='SummonerFlash' />
-               <SecondaryPerkIcon runeTreeId='7200' runeTreeName='Domination' />
+               <SummonerSpellIcon
+                  summonerSpell={getSummonerSpellByKey(props.summonerSpellsData, participantStats.summoner1Id)!}
+               />
+               <PrimaryRuneIcon
+                  rune={findRune(
+                     props.runesData,
+                     participantStats.perks.styles[0].style,
+                     0,
+                     participantStats.perks.styles[0].selections[0].perk
+                  )!}
+               />
+               <SummonerSpellIcon
+                  summonerSpell={getSummonerSpellByKey(props.summonerSpellsData, participantStats.summoner2Id)!}
+               />
+               <SecondaryPerkIcon
+                  perk={findPerk(props.runesData, participantStats.perks.styles[1].style)!}
+               />
             </div>
 
             <div className='ParticipantNameAndRank flex flex-col ml-1'>
-               <p className='text-xs font-bold'>Summoner Name</p>
+               <Link
+                  href={`/lol/${encodeURIComponent(props.participantStats.riotIdGameName)}-${encodeURIComponent(props.participantStats.riotIdTagline)}`}
+                  className='text-xs font-bold'>
+                  {props.participantStats.summonerName}
+               </Link>
                <div className='flex'>
                   <div className='RankEmblemContainer h-full w-1/4 relative'>
                      <Image
@@ -197,7 +251,7 @@ function ExpandedParticipantInfo(props: { participantStats: any, highestDamageIn
             <div className='DamageToChampionsBar w-4/5 h-2 bg-white bg-opacity-10 relative'>
                <div
                   className={`h-full bg-white bg-opacity-20 absolute`}
-                  style={{ width: `${calculateDamagePercentage(highestDamageInGame)}` }}
+                  style={{ width: `${calculateDamagePercentage(participantStats.totalDamageDealtToChampions, highestDamageInGame)}` }}
                >
                </div>
             </div>
@@ -234,7 +288,15 @@ function ExpandedParticipantInfo(props: { participantStats: any, highestDamageIn
    )
 
 }
-function ExpandedTeamOverview(props: { participantsData: [any, any, any, any, any], highestDamageInGame: number }) {
+
+
+function ExpandedTeamOverview(props: {
+   participantsData: ParticipantInformation[],
+   summonerSpellsData: SummonerSpells,
+   runesData: PerkData,
+   highestDamageInGame: number
+}) {
+
    const { participantsData, highestDamageInGame } = props;
 
    let backgroundColor = (participantsData[0].win ? WIN_BACKGROUND_COLOR : LOSS_BACKGROUND_COLOR);
@@ -257,12 +319,17 @@ function ExpandedTeamOverview(props: { participantsData: [any, any, any, any, an
          </div>
 
          <div className='flex flex-col gap-2 p-1'>
-            <ExpandedParticipantInfo participantStats={participantsData[0]} highestDamageInGame={highestDamageInGame} />
-            <ExpandedParticipantInfo participantStats={participantsData[1]} highestDamageInGame={highestDamageInGame} />
-            <ExpandedParticipantInfo participantStats={participantsData[2]} highestDamageInGame={highestDamageInGame} />
-            <ExpandedParticipantInfo participantStats={participantsData[3]} highestDamageInGame={highestDamageInGame} />
-            <ExpandedParticipantInfo participantStats={participantsData[4]} highestDamageInGame={highestDamageInGame} />
+            {participantsData.map((participant, index) => (
+               <ExpandedParticipantInfo
+                  key={index}
+                  participantStats={participant}
+                  runesData={props.runesData}
+                  summonerSpellsData={props.summonerSpellsData}
+                  highestDamageInGame={highestDamageInGame}
+               />
+            ))}
          </div>
+
       </div>
    )
 }
@@ -272,10 +339,10 @@ export function MatchSummaryCard(props: { matchId: string, puuid: string }) {
    const { matchId, puuid } = props;
    const [summonerIndex, setSummonerIndex] = useState<number>(0);
    const [loading, setLoading] = useState<boolean>(true);
-   const [error, setError] = useState<string | null>(null);
-   const [matchData, setMatchData] = useState<MatchInformation | null>(null);
-   const [summonerSpellsData, setSummonerSpellsData] = useState<SummonerSpells | null>(null);
-   const [runesData, setRuneData] = useState<PerkData | null>(null);
+   const [error, setError] = useState<string>();
+   const [matchData, setMatchData] = useState<MatchInformation>();
+   const [summonerSpellsData, setSummonerSpellsData] = useState<SummonerSpells>();
+   const [runesData, setRuneData] = useState<PerkData>();
 
    useEffect(() => {
       const fetchData = async () => {
@@ -291,7 +358,6 @@ export function MatchSummaryCard(props: { matchId: string, puuid: string }) {
 
             const fetchedRuneData: PerkData = await fetchRunesData(fetchedMatchData.info.gameVersion);
             setRuneData(fetchedRuneData);
-            console.log('fetchedRuneData:', fetchedRuneData);
          }
          catch (error: any) {
             setError(error.message);
@@ -305,7 +371,7 @@ export function MatchSummaryCard(props: { matchId: string, puuid: string }) {
    }, [matchId]);
 
 
-   // handle card expansion
+   // Handle card expansion
    const [isRotated, setIsRotated] = useState(false);
    const [isExpanded, setIsExpanded] = useState(false);
    function toggleCardExpansion() {
@@ -314,36 +380,12 @@ export function MatchSummaryCard(props: { matchId: string, puuid: string }) {
    }
 
 
-   function getSummonerSpellByKey(summonerSpellKey: number): SummonerSpell | undefined {
-      for (const spellKey in summonerSpellsData?.data) {
-         if (summonerSpellsData.data[spellKey].key === summonerSpellKey.toString()) {
-            return summonerSpellsData.data[spellKey];
-         }
-      }
-      return undefined;
-   }
-
-   function findRune(perkId: number, slotIndex: number, runeId: number): Rune | undefined {
-      const perk = runesData!.find(p => p.id === perkId);
-      console.log('perk', perk)
-      if (perk && perk.slots[slotIndex]) {
-         return perk.slots[slotIndex].runes.find(r => r.id === runeId);
-      }
-      return undefined;
-   }
-
-
-   function findPerk(perkId: number): Perk | undefined {
-      return runesData?.find(perk => perk.id === perkId);
-   }
-
    function calculateMinionsPerMinute(totalMinionsKilled: number, gameDuration: number): string {
       return (totalMinionsKilled / (gameDuration / 60)).toFixed(2);
    }
 
 
-   //TODO: Update params
-   // returns xxm xxs formatted game time
+   // Returns XXm XXs formatted game time. Example: 20m 30s
    const formattedGameTime = () => {
       const minutes = Math.floor(matchData!.info.gameDuration / 60);
       const remainingSeconds = matchData!.info.gameDuration % 60;
@@ -393,20 +435,21 @@ export function MatchSummaryCard(props: { matchId: string, puuid: string }) {
                   < ChampionIcon championName={matchData!.info.participants[summonerIndex].championName} />
                </div>
                <SummonerSpellIcon
-                  summonerSpell={getSummonerSpellByKey(matchData!.info.participants[summonerIndex].summoner1Id)!}
+                  summonerSpell={getSummonerSpellByKey(summonerSpellsData!, matchData!.info.participants[summonerIndex].summoner1Id)!}
                />
                <PrimaryRuneIcon
                   rune={findRune(
+                     runesData!,
                      matchData!.info.participants[summonerIndex].perks.styles[0].style,
                      0,
                      matchData!.info.participants[summonerIndex].perks.styles[0].selections[0].perk
                   )!}
                />
                <SummonerSpellIcon
-                  summonerSpell={getSummonerSpellByKey(matchData!.info.participants[summonerIndex].summoner2Id)!}
+                  summonerSpell={getSummonerSpellByKey(summonerSpellsData!, matchData!.info.participants[summonerIndex].summoner2Id)!}
                />
                <SecondaryPerkIcon
-                  perk={findPerk(matchData!.info.participants[summonerIndex].perks.styles[1].style)!}
+                  perk={findPerk(runesData!, matchData!.info.participants[summonerIndex].perks.styles[1].style)!}
                />
             </div>
 
@@ -423,13 +466,13 @@ export function MatchSummaryCard(props: { matchId: string, puuid: string }) {
             </div>
 
             <div className='ItemsSection grid grid-cols-4 grid-rows-2 gap-1 w-24 h-12'>
-               <ItemIcon itemId={matchData!.info.participants[summonerIndex].item0.toString()} />
-               <ItemIcon itemId={matchData!.info.participants[summonerIndex].item1.toString()} />
-               <ItemIcon itemId={matchData!.info.participants[summonerIndex].item2.toString()} />
-               <ItemIcon itemId={matchData!.info.participants[summonerIndex].item6.toString()} />
-               <ItemIcon itemId={matchData!.info.participants[summonerIndex].item3.toString()} />
-               <ItemIcon itemId={matchData!.info.participants[summonerIndex].item4.toString()} />
-               <ItemIcon itemId={matchData!.info.participants[summonerIndex].item5.toString()} />
+               <ItemIcon itemId={matchData!.info.participants[summonerIndex].item0} />
+               <ItemIcon itemId={matchData!.info.participants[summonerIndex].item1} />
+               <ItemIcon itemId={matchData!.info.participants[summonerIndex].item2} />
+               <ItemIcon itemId={matchData!.info.participants[summonerIndex].item6} />
+               <ItemIcon itemId={matchData!.info.participants[summonerIndex].item3} />
+               <ItemIcon itemId={matchData!.info.participants[summonerIndex].item4} />
+               <ItemIcon itemId={matchData!.info.participants[summonerIndex].item5} />
             </div>
 
             <div className='Participants flex gap-x-2'>
@@ -466,28 +509,22 @@ export function MatchSummaryCard(props: { matchId: string, puuid: string }) {
             </div>
 
          </div>
-         {/* <div className={`flex flex-col ${isExpanded ? '' : 'hidden'}`} style={{ backgroundColor: backgroundColor }}>
+         <div className={`flex flex-col ${isExpanded ? '' : 'hidden'}`} style={{ backgroundColor: backgroundColor }}>
             <ExpandedTeamOverview
-               participantsData={[
-                  matchData!.info.participants[0],
-                  matchData!.info.participants[1],
-                  matchData!.info.participants[2],
-                  matchData!.info.participants[3],
-                  matchData!.info.participants[4]
-               ]}
+               participantsData={matchData!.info.participants.slice(0, 5)}
+               summonerSpellsData={summonerSpellsData!}
+               runesData={runesData!}
                highestDamageInGame={highestDamageInGame!}
             />
+
             <ExpandedTeamOverview
-               participantsData={[
-                  matchData!.info.participants[5],
-                  matchData!.info.participants[6],
-                  matchData!.info.participants[7],
-                  matchData!.info.participants[8],
-                  matchData!.info.participants[9]
-               ]}
+               participantsData={matchData!.info.participants.slice(5, 10)}
+               summonerSpellsData={summonerSpellsData!}
+               runesData={runesData!}
                highestDamageInGame={highestDamageInGame!}
             />
-         </div> */}
+
+         </div>
       </div>
    )
 }

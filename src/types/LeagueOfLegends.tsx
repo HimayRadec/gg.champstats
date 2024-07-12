@@ -153,7 +153,7 @@ export type ParticipantInformation = {
    puuid: string;
    quadraKills: number;
    riotIdGameName: string;
-   riotIdTagLine: string;
+   riotIdTagline: string;
    role: string;
    sightWardsBoughtInGame: number;
    spell1Casts: number;
