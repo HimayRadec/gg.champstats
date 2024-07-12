@@ -3,7 +3,7 @@ Created By: Himay on 7/11/2024
 Lasted Edited By: Himay 7/11/2024
 File Level: Junior Developer
 Overview: Gets summoner spells data from the ddragon API using the version number.
-Example URL: /api/riot/LeagueOfLegends/getSummonerSpellsData?Version=14.13.1 
+Example URL: /api/riot/LeagueOfLegends/getSummonerSpellsDataByVersion?Version=14.13.1 
 
 Link to the API: https://ddragon.leagueoflegends.com/cdn/14.13.1/data/en_US/summoner.json
 */

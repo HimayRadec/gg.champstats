@@ -99,7 +99,7 @@ export async function fetchSummonerSpellsData(gameVersion: string): Promise<Summ
    console.log(`fetchSummmoerSpellsData: Fetching spells for version: ${version}`)
 
    try {
-      const response = await fetch(`${LeagueAPIRoute}getSummonerSpellsData?Version=${version}`);
+      const response = await fetch(`${LeagueAPIRoute}getSummonerSpellsDataByVersion?Version=${version}`);
       const fetchedData = await response.json();
 
       // console.log('fetchSummonerSpellsData: fetchedData:', JSON.stringify(fetchedData));
@@ -107,6 +107,24 @@ export async function fetchSummonerSpellsData(gameVersion: string): Promise<Summ
    }
    catch (error: any) {
       console.error('Error fetching summoner spell icon:', error);
+      throw error;
+   }
+}
+
+export async function fetchRunesData(gameVersion: string): Promise<any> {
+   // format the version number to only include the first two numbers 
+   let version = gameVersion.split('.').slice(0, 2).join('.');
+   console.log(`fetchRunesData: Fetching runes for version: ${version}`)
+
+   try {
+      const response = await fetch(`${LeagueAPIRoute}getRunesDataByVersion?Version=${version}`);
+      const fetchedData = await response.json();
+
+      // console.log('fetchRunesData: fetchedData:', JSON.stringify(fetchedData));
+      return fetchedData.data;
+   }
+   catch (error: any) {
+      console.error('Error fetching runes data:', error);
       throw error;
    }
 }

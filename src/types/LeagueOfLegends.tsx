@@ -262,3 +262,26 @@ export type SummonerSpells = {
    version: string;
    data: Record<string, SummonerSpell>;
 }
+
+export type Rune = {
+   id: number;
+   key: string;
+   icon: string;
+   name: string;
+   shortDesc: string;
+   longDesc: string;
+};
+
+export type RuneSlot = {
+   runes: Rune[];
+};
+
+export type Perk = {
+   id: number;
+   key: string;
+   icon: string;
+   name: string;
+   slots: RuneSlot[];
+};
+
+export type PerkData = Perk[];

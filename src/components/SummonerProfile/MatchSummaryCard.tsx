@@ -1,4 +1,3 @@
-
 /*
 Created By: Himay on 5/15/2024?
 Last Edited By: Himay on 5/17/2024
@@ -23,17 +22,18 @@ Parent Component:
 
 */
 
+//TOOD: Add Tooltip for summoner spells and runes https://mui.com/material-ui/react-tooltip/
+
 'use client'
 import { useEffect, useState } from 'react';
 import Image from 'next/image'
 import { SummonerInfo } from '@/types/MatchSummary';
-import { fetchMatchByMatchID, fetchSummonerSpellsData } from '@/utils/formatApiData/fetchLeagueOfLegendsData';
-import { MatchInformation, SummonerSpells, SummonerSpell } from '@/types/LeagueOfLegends';
+import { fetchMatchByMatchID, fetchSummonerSpellsData, fetchRunesData } from '@/utils/formatApiData/fetchLeagueOfLegendsData';
+import { MatchInformation, SummonerSpells, SummonerSpell, PerkData, Perk, RuneSlot, Rune } from '@/types/LeagueOfLegends';
 import { json } from 'stream/consumers';
 
-//Hex color codes for win and loss
-const winBackgroundColor = '#12264a';
-const lossBackgroundColor = '#5e1515';
+const WIN_BACKGROUND_COLOR = '#12264a';
+const LOSS_BACKGROUND_COLOR = '#5e1515';
 
 function ChampionIcon(props: { championName: string }) {
    const { championName } = props;
@@ -50,13 +50,17 @@ function ChampionIcon(props: { championName: string }) {
 }
 
 // Fetches the summoner spell icon using the summoner spell name
-function SummonerSpellIcon(props: { summonerSpellData: SummonerSpell }) {
-   const { summonerSpellData } = props;
+function SummonerSpellIcon(props: { summonerSpell: SummonerSpell }) {
+   const { summonerSpell: summonerSpellData } = props;
    if (!summonerSpellData) return null;
+
    return (
-      <div className='SummonerSpellIcon relative h-full w-full'>
+      <div
+         className='SummonerSpellIcon relative h-full w-full'
+      >
          <Image
             src={`https://ddragon.leagueoflegends.com/cdn/14.10.1/img/spell/${summonerSpellData.image.full}`}
+            // src={`https://ddragon.leagueoflegends.com/cdn/14.10.1/img/spell/SummonerFlash.png`}
             alt={`Summoner ${summonerSpellData.name}`}
             sizes='100%'
             priority={false}
@@ -66,12 +70,14 @@ function SummonerSpellIcon(props: { summonerSpellData: SummonerSpell }) {
    );
 }
 
-function PrimaryRuneIcon(props: { runeName: string, runeTreeName: string }) {
-   const { runeName, runeTreeName } = props;
+function PrimaryRuneIcon(props: { rune: Rune }) {
+   const { rune } = props;
+   if (!rune) return null;
+
    return (
       <div className='PrimaryRuneIcon relative h-full w-full'>
          <Image
-            src={`https://ddragon.leagueoflegends.com/cdn/img/perk-images/Styles/${runeTreeName}/${runeName}/${runeName}.png`}
+            src={`https://ddragon.leagueoflegends.com/cdn/img/${rune.icon}`}
             alt='profile-icon'
             sizes='100%'
             priority={false}
@@ -81,14 +87,17 @@ function PrimaryRuneIcon(props: { runeName: string, runeTreeName: string }) {
    );
 }
 
-function SecondaryRuneIcon(props: { runeTreeId: string, runeTreeName: string }) {
-   const { runeTreeId, runeTreeName } = props;
+function SecondaryPerkIcon(props: { perk: Perk }) {
+   const { perk } = props;
+   if (!perk) return null;
+
    return (
-      <div className='SecondaryRuneIcon relative h-full w-full'>
+      <div className='PrimaryRuneIcon relative h-full w-full'>
          <Image
-            src={`https://ddragon.leagueoflegends.com/cdn/img/perk-images/Styles/${runeTreeId}_${runeTreeName}.png`}
+            src={`https://ddragon.leagueoflegends.com/cdn/img/${perk.icon}`}
             alt='profile-icon'
             sizes='100%'
+            priority={false}
             fill
          />
       </div>
@@ -159,7 +168,7 @@ function ExpandedParticipantInfo(props: { participantStats: any, highestDamageIn
                <SummonerSpellIcon summonerSpell='SummonerExhaust' />
                <PrimaryRuneIcon runeName='ArcaneComet' runeTreeName='Sorcery' />
                <SummonerSpellIcon summonerSpell='SummonerFlash' />
-               <SecondaryRuneIcon runeTreeId='7200' runeTreeName='Domination' />
+               <SecondaryPerkIcon runeTreeId='7200' runeTreeName='Domination' />
             </div>
 
             <div className='ParticipantNameAndRank flex flex-col ml-1'>
@@ -228,7 +237,7 @@ function ExpandedParticipantInfo(props: { participantStats: any, highestDamageIn
 function ExpandedTeamOverview(props: { participantsData: [any, any, any, any, any], highestDamageInGame: number }) {
    const { participantsData, highestDamageInGame } = props;
 
-   let backgroundColor = (participantsData[0].win ? winBackgroundColor : lossBackgroundColor);
+   let backgroundColor = (participantsData[0].win ? WIN_BACKGROUND_COLOR : LOSS_BACKGROUND_COLOR);
    let textColor = (participantsData[0].win ? '#4287f5' : '#f54242');
 
    return (
@@ -266,6 +275,7 @@ export function MatchSummaryCard(props: { matchId: string, puuid: string }) {
    const [error, setError] = useState<string | null>(null);
    const [matchData, setMatchData] = useState<MatchInformation | null>(null);
    const [summonerSpellsData, setSummonerSpellsData] = useState<SummonerSpells | null>(null);
+   const [runesData, setRuneData] = useState<PerkData | null>(null);
 
    useEffect(() => {
       const fetchData = async () => {
@@ -278,6 +288,10 @@ export function MatchSummaryCard(props: { matchId: string, puuid: string }) {
 
             const fetchedSummonerSpellData: SummonerSpells = await fetchSummonerSpellsData(fetchedMatchData.info.gameVersion)
             setSummonerSpellsData(fetchedSummonerSpellData);
+
+            const fetchedRuneData: PerkData = await fetchRunesData(fetchedMatchData.info.gameVersion);
+            setRuneData(fetchedRuneData);
+            console.log('fetchedRuneData:', fetchedRuneData);
          }
          catch (error: any) {
             setError(error.message);
@@ -309,6 +323,24 @@ export function MatchSummaryCard(props: { matchId: string, puuid: string }) {
       return undefined;
    }
 
+   function findRune(perkId: number, slotIndex: number, runeId: number): Rune | undefined {
+      const perk = runesData!.find(p => p.id === perkId);
+      console.log('perk', perk)
+      if (perk && perk.slots[slotIndex]) {
+         return perk.slots[slotIndex].runes.find(r => r.id === runeId);
+      }
+      return undefined;
+   }
+
+
+   function findPerk(perkId: number): Perk | undefined {
+      return runesData?.find(perk => perk.id === perkId);
+   }
+
+   function calculateMinionsPerMinute(totalMinionsKilled: number, gameDuration: number): string {
+      return (totalMinionsKilled / (gameDuration / 60)).toFixed(2);
+   }
+
 
    //TODO: Update params
    // returns xxm xxs formatted game time
@@ -323,7 +355,7 @@ export function MatchSummaryCard(props: { matchId: string, puuid: string }) {
       return Math.max(highestDamage, participant.totalDamageDealtToChampions);
    }, 0));
 
-   let backgroundColor = (matchData?.info.participants[summonerIndex].win ? winBackgroundColor : lossBackgroundColor);
+   let backgroundColor = (matchData?.info.participants[summonerIndex].win ? WIN_BACKGROUND_COLOR : LOSS_BACKGROUND_COLOR);
 
    if (loading) {
       return <p>Loading...</p>;
@@ -347,74 +379,80 @@ export function MatchSummaryCard(props: { matchId: string, puuid: string }) {
             style={{ backgroundColor: backgroundColor }}
          >
 
-            <div className='flex flex-col items-center w-max'>
+            <div className='MatchInfo flex flex-col items-center w-max'>
                <div>{matchData?.info.gameType}</div>
                <div>{matchData?.info.gameEndTimestamp}</div>
-               {/* <div className='flex w-full justify-center gap-x-2	'>
-                  <p className='font-size-lg font-extrabold	'>^</p>
-                  <div>30 LP</div>
-               </div> */}
                <div>{`${matchData?.info.participants[summonerIndex].win ? 'Win' : 'Loss'}`}</div>
                <div className='flex justify-center gap-x-2'>
                   <div>{formattedGameTime()}</div>
                </div>
             </div>
 
-            <div className='grid grid-cols-4 grid-rows-2 gap-1 w-24 h-12'>
+            <div className='ParticipantLoadout grid grid-cols-4 grid-rows-2 gap-1 w-24 h-12'>
                <div className='col-span-2 row-span-2'>
                   < ChampionIcon championName={matchData!.info.participants[summonerIndex].championName} />
                </div>
                <SummonerSpellIcon
-                  summonerSpellData={getSummonerSpellByKey(matchData!.info.participants[summonerIndex].summoner1Id)!}
+                  summonerSpell={getSummonerSpellByKey(matchData!.info.participants[summonerIndex].summoner1Id)!}
                />
                <PrimaryRuneIcon
-                  runeName={matchData!.info.participants[summonerIndex].perks.styles[0].style.toString()}
-                  runeTreeName={matchData!.info.participants[summonerIndex].perks.styles[0].style.toString()}
+                  rune={findRune(
+                     matchData!.info.participants[summonerIndex].perks.styles[0].style,
+                     0,
+                     matchData!.info.participants[summonerIndex].perks.styles[0].selections[0].perk
+                  )!}
                />
                <SummonerSpellIcon
-                  summonerSpellData={getSummonerSpellByKey(matchData!.info.participants[summonerIndex].summoner2Id)!}
+                  summonerSpell={getSummonerSpellByKey(matchData!.info.participants[summonerIndex].summoner2Id)!}
                />
-               <SecondaryRuneIcon
-                  runeTreeId={matchData!.info.participants[summonerIndex].perks.styles[1].style.toString()}
-                  runeTreeName={matchData!.info.participants[summonerIndex].perks.styles[1].style.toString()}
+               <SecondaryPerkIcon
+                  perk={findPerk(matchData!.info.participants[summonerIndex].perks.styles[1].style)!}
                />
             </div>
 
-            <div className='flex flex-col items-center w-max'>
-               <div>
+            <div className='ParticipantStatistics flex flex-col items-center w-max'>
+               <div className='KDA'>
                   {`${matchData?.info.participants[summonerIndex].kills} / ${matchData?.info.participants[summonerIndex].deaths} / ${matchData?.info.participants[summonerIndex].assists}`}
                </div>
-               <div>{matchData?.info.participants[summonerIndex].kills.toFixed(2)}</div>
-               <div>{`${0} (${0})`}</div>
-               <div>{`${0} vision`}</div>
+               <div className='CalculatedKDA'>{matchData?.info.participants[summonerIndex].kills.toFixed(2)}</div>
+               <div className='CS'>
+                  {`${matchData?.info.participants[summonerIndex].totalMinionsKilled} CS 
+                  (${calculateMinionsPerMinute(matchData!.info.participants[summonerIndex].totalMinionsKilled, matchData!.info.gameDuration)})`}
+               </div>
+               <div className='Vision'>{`${matchData?.info.participants[summonerIndex].visionScore} vision`}</div>
             </div>
 
             <div className='ItemsSection grid grid-cols-4 grid-rows-2 gap-1 w-24 h-12'>
                <ItemIcon itemId={matchData!.info.participants[summonerIndex].item0.toString()} />
                <ItemIcon itemId={matchData!.info.participants[summonerIndex].item1.toString()} />
                <ItemIcon itemId={matchData!.info.participants[summonerIndex].item2.toString()} />
+               <ItemIcon itemId={matchData!.info.participants[summonerIndex].item6.toString()} />
                <ItemIcon itemId={matchData!.info.participants[summonerIndex].item3.toString()} />
                <ItemIcon itemId={matchData!.info.participants[summonerIndex].item4.toString()} />
                <ItemIcon itemId={matchData!.info.participants[summonerIndex].item5.toString()} />
-               <ItemIcon itemId={matchData!.info.participants[summonerIndex].item6.toString()} />
             </div>
 
-            <div className='flex gap-x-2'>
-               {/* TODO: for loops this */}
+            <div className='Participants flex gap-x-2'>
                <div className='left-team'>
-                  <ParticipantChampionIconAndSummonerName championName={matchData!.info.participants[0].championName} summonerName={matchData!.info.participants[0].summonerName} />
-                  <ParticipantChampionIconAndSummonerName championName={matchData!.info.participants[1].championName} summonerName={matchData!.info.participants[1].summonerName} />
-                  <ParticipantChampionIconAndSummonerName championName={matchData!.info.participants[2].championName} summonerName={matchData!.info.participants[2].summonerName} />
-                  <ParticipantChampionIconAndSummonerName championName={matchData!.info.participants[3].championName} summonerName={matchData!.info.participants[3].summonerName} />
-                  <ParticipantChampionIconAndSummonerName championName={matchData!.info.participants[4].championName} summonerName={matchData!.info.participants[4].summonerName} />
+                  {matchData!.info.participants.slice(0, 5).map((participant, index) => (
+                     <ParticipantChampionIconAndSummonerName
+                        key={index}
+                        championName={participant.championName}
+                        summonerName={participant.summonerName}
+                     />
+                  ))}
                </div>
+
                <div className='right-team'>
-                  <ParticipantChampionIconAndSummonerName championName={matchData!.info.participants[5].championName} summonerName={matchData!.info.participants[5].summonerName} />
-                  <ParticipantChampionIconAndSummonerName championName={matchData!.info.participants[6].championName} summonerName={matchData!.info.participants[6].summonerName} />
-                  <ParticipantChampionIconAndSummonerName championName={matchData!.info.participants[7].championName} summonerName={matchData!.info.participants[7].summonerName} />
-                  <ParticipantChampionIconAndSummonerName championName={matchData!.info.participants[8].championName} summonerName={matchData!.info.participants[8].summonerName} />
-                  <ParticipantChampionIconAndSummonerName championName={matchData!.info.participants[9].championName} summonerName={matchData!.info.participants[9].summonerName} />
+                  {matchData!.info.participants.slice(5, 10).map((participant, index) => (
+                     <ParticipantChampionIconAndSummonerName
+                        key={index}
+                        championName={participant.championName}
+                        summonerName={participant.summonerName}
+                     />
+                  ))}
                </div>
+
 
                <div className='bg-white bg-opacity-10 w-8 flex flex-col items-center'>
                   <button
