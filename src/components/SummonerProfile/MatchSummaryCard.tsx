@@ -26,6 +26,8 @@ Parent Component:
 //TODO: Correctly Assign Blue and Red Side
 //TODO: Add Rank and LP to the card
 //TODO: Calculate LP Gain/Loss
+//TODO: Fix matched game and time since game was played
+//TODO: Add links to summoner names on the cards
 
 
 'use client'
