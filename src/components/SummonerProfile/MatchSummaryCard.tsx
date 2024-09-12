@@ -419,9 +419,9 @@ export function MatchSummaryCard(props: { matchId: string, puuid: string }) {
    }
 
    return (
-      <div className='flex flex-col gap-1' >
+      <div className='flex flex-col gap-1 w-full' >
          <div
-            className='match-summary-card-top flex items-center gap-x-5 w-fit'
+            className='match-summary-card-top flex items-center gap-x-5 min-w-fit'
             // Tailwind CSS doesn't support inline styles for background colors using template literals directly within the class name
             style={{ backgroundColor: backgroundColor }}
          >
@@ -502,7 +502,7 @@ export function MatchSummaryCard(props: { matchId: string, puuid: string }) {
                </div>
 
 
-               <div className='bg-white bg-opacity-10 w-8 flex flex-col items-center'>
+               <div className='button-bar bg-white bg-opacity-10 w-8 flex flex-col items-center ml-auto'>
                   <button
                      className={`bg-white bg-opacity-10 size-5 mb-3 mt-auto flex items-center justify-center ${isRotated ? 'rotate-180' : ''}`}
                      onClick={toggleCardExpansion}

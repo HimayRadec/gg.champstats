@@ -65,8 +65,12 @@ export default function Page({ params }: { params: { summoner: string } }) {
                <div className="mb-2">
                   <SummonerProfileComponent accountData={accountData} />
                </div>
-               <div>
-                  <MatchSummaryCard matchId={matchIds[0]} puuid={accountData.puuid} />
+               <div className="flex flex-col border gap-y-1">
+                  {matchIds.slice(0, 4).map((matchId) => (
+                     <MatchSummaryCard key={matchId} matchId={matchId} puuid={accountData.puuid} />
+                  ))}
+
+                  {/* <MatchSummaryCard matchId={matchIds[0]} puuid={accountData.puuid} /> */}
                   {matchIds?.map((matchId) => (
                      <div key={matchId}>
                         <p>{matchId}</p>
