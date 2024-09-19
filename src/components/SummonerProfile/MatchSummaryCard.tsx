@@ -28,6 +28,7 @@ Parent Component:
 //TODO: Calculate LP Gain/Loss
 //TODO: Fix matched game and time since game was played
 //TODO: Add links to summoner names on the cards
+//TODO: Remove data fetching from the component and pass it as props
 
 
 'use client'

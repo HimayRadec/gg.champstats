@@ -59,14 +59,15 @@ export default function Page({ params }: { params: { summoner: string } }) {
    }
 
    return (
-      <div className="flex flex-col items-center">
+      <div className="flex flex-col border max-w-[1000px] m-auto">
          {accountData && (
             <>
+
                <div className="mb-2">
                   <SummonerProfileComponent accountData={accountData} />
                </div>
-               <div className="flex flex-col border gap-y-1">
-                  {matchIds.slice(0, 4).map((matchId) => (
+               <div className="flex flex-col gap-y-1">
+                  {matchIds.slice(0, 5).map((matchId) => (
                      <MatchSummaryCard key={matchId} matchId={matchId} puuid={accountData.puuid} />
                   ))}
 
@@ -77,6 +78,8 @@ export default function Page({ params }: { params: { summoner: string } }) {
                      </div>
                   ))}
                </div>
+
+
             </>
          )}
       </div>
