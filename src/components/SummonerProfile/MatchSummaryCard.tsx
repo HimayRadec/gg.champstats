@@ -341,28 +341,24 @@ function ExpandedTeamOverview(props: {
 }
 
 
-export function MatchSummaryCard(props: { matchId: string, puuid: string }) {
-   const { matchId, puuid } = props;
+export function MatchSummaryCard(props: { matchData: MatchInformation, puuid: string }) {
+   const { matchData, puuid } = props;
    const [summonerIndex, setSummonerIndex] = useState<number>(0);
    const [loading, setLoading] = useState<boolean>(true);
    const [error, setError] = useState<string>();
-   const [matchData, setMatchData] = useState<MatchInformation>();
    const [summonerSpellsData, setSummonerSpellsData] = useState<SummonerSpells>();
    const [runesData, setRuneData] = useState<PerkData>();
 
    useEffect(() => {
       const fetchData = async () => {
          try {
-            const fetchedMatchData: MatchInformation = await fetchMatchByMatchID(matchId);
-            setMatchData(fetchedMatchData);
-
-            const summonerParticipantIndex = fetchedMatchData.info.participants.findIndex((participant: any) => participant.puuid === puuid);
+            const summonerParticipantIndex = matchData.info.participants.findIndex((participant: any) => participant.puuid === puuid);
             setSummonerIndex(summonerParticipantIndex);
 
-            const fetchedSummonerSpellData: SummonerSpells = await fetchSummonerSpellsData(fetchedMatchData.info.gameVersion)
+            const fetchedSummonerSpellData: SummonerSpells = await fetchSummonerSpellsData(matchData.info.gameVersion)
             setSummonerSpellsData(fetchedSummonerSpellData);
 
-            const fetchedRuneData: PerkData = await fetchRunesData(fetchedMatchData.info.gameVersion);
+            const fetchedRuneData: PerkData = await fetchRunesData(matchData.info.gameVersion);
             setRuneData(fetchedRuneData);
          }
          catch (error: any) {
@@ -374,7 +370,7 @@ export function MatchSummaryCard(props: { matchId: string, puuid: string }) {
       };
 
       fetchData();
-   }, [matchId]);
+   }, []);
 
 
    // Handle card expansion

@@ -85,6 +85,7 @@ export async function fetchMatchByMatchID(matchId: string): Promise<MatchInforma
       }
 
       const fetchedData = await response.json();
+      console.log(`fetchMatchByMatchID: fetchedData: for matchId: ${matchId}`);
       return fetchedData.data;
    }
    catch (error: any) {

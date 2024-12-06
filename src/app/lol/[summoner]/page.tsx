@@ -14,8 +14,8 @@ Example URL: champstats.gg/lol/radec%20himay-NA1
 //TODO: Only fetch 10 match ids at a time
 
 import { useEffect, useState } from "react";
-import { fetchAccountByRiotID, fetchMatchIdsByPUUID } from "@/utils/formatApiData/fetchLeagueOfLegendsData";
-import { AccountInformation } from "@/types/LeagueOfLegends";
+import { fetchAccountByRiotID, fetchMatchIdsByPUUID, fetchMatchByMatchID } from "@/utils/formatApiData/fetchLeagueOfLegendsData";
+import { AccountInformation, MatchInformation } from "@/types/LeagueOfLegends";
 import SummonerProfileComponent from "@/components/SummonerProfile/SummonerProfile";
 import { MatchSummaryCard } from "@/components/SummonerProfile/MatchSummaryCard";
 
@@ -25,17 +25,27 @@ export default function Page({ params }: { params: { summoner: string } }) {
 
    const [accountData, setAccountData] = useState<AccountInformation | null>(null);
    const [matchIds, setMatchIds] = useState<string[]>([]);
+   const [matchesData, setMatchesData] = useState<MatchInformation[]>([]);
+
    const [loading, setLoading] = useState<boolean>(true);
    const [error, setError] = useState<string | null>(null);
 
    useEffect(() => {
       const fetchData = async () => {
          try {
+            // Fetch the account data
             const fetchedAccountData: AccountInformation = await fetchAccountByRiotID(gameName, tagLine);
             setAccountData(fetchedAccountData);
 
+            // Fetch the last 20 match ids of the account
             const fetchedMatchIds: string[] = await fetchMatchIdsByPUUID(fetchedAccountData.puuid);
             setMatchIds(fetchedMatchIds);
+
+            // Fetch the match data 
+            const initialMatches = await Promise.all(
+               fetchedMatchIds.slice(0, 5).map((matchId) => fetchMatchByMatchID(matchId))
+            );
+            setMatchesData(initialMatches);
 
          }
          catch (error: any) {
@@ -67,19 +77,14 @@ export default function Page({ params }: { params: { summoner: string } }) {
                   <SummonerProfileComponent accountData={accountData} />
                </div>
                <div className="flex flex-col gap-y-1">
-                  {matchIds.slice(0, 5).map((matchId) => (
-                     <MatchSummaryCard key={matchId} matchId={matchId} puuid={accountData.puuid} />
-                  ))}
-
-                  {/* <MatchSummaryCard matchId={matchIds[0]} puuid={accountData.puuid} /> */}
-                  {matchIds?.map((matchId) => (
-                     <div key={matchId}>
-                        <p>{matchId}</p>
-                     </div>
+                  {matchesData.map((match, index) => (
+                     <MatchSummaryCard
+                        key={match.info.gameId}
+                        matchData={match}
+                        puuid={accountData.puuid}
+                     />
                   ))}
                </div>
-
-
             </>
          )}
       </div>
