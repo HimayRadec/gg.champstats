@@ -24,12 +24,8 @@ export type AccountInformation = {
    tagLine: string;
 }
 
-export type MatchInformation = {
-   metaData: {
-      dataVersion: string;
-      matchId: string;
-      participants: string[];
-   }
+export type MatchDto = {
+   metaData: MetadataDto;
    info: {
       endOfGameResult: string;
       gameCreation: number;
@@ -42,7 +38,7 @@ export type MatchInformation = {
       gameType: string;
       gameVersion: string;
       mapId: number;
-      participants: ParticipantInformation[];
+      participants: ParticipantDto[];
       platformId: string;
       queueId: number;
       teams: Team[];
@@ -50,28 +46,51 @@ export type MatchInformation = {
    }
 }
 
-export type ParticipantInformation = {
+export type MetadataDto = {
+   dataVersion: string;
+   matchId: string;
+   participants: string[];
+}
+
+export type infoDto = {
+   endOfGameResult: string;
+   gameCreation: number;
+   gameDuration: number;
+   gameEndTimestamp: number;
+   gameId: number;
+   gameMode: string;
+   gameName: string;
+   gameStartTimestamp: number;
+   gameType: string;
+   gameVersion: string;
+   mapId: number;
+   participants: ParticipantDto[];
+   platformId: string;
+   queueId: number;
+   teams: Team[];
+   tournamentCode: string;
+}
+
+export type ParticipantDto = {
    allInPings: number;
    assistMePings: number;
    assists: number;
    baronKills: number;
-   basicPings: number;
    bountyLevel: number;
-   challenges: {
-      //TODO: Create a type for challenges
-   }
    championExperience: number;
    champLevel: number;
    championId: number;
    championName: string;
-   championTransform: number;
    commandPings: number;
+   championTransform: number;
    consumablesPurchased: number;
+   challenges: {
+      //TODO: Create a type for challenges
+   }
    damageDealtToBuildings: number;
    damageDealtToObjectives: number;
    damageDealtToTurrets: number;
    damageSelfMitigated: number;
-   dangerousPings: number;
    deaths: number;
    detectorWardsPlaced: number;
    doubleKills: number;
@@ -85,10 +104,10 @@ export type ParticipantInformation = {
    firstTowerKill: boolean;
    gameEndedInEarlySurrender: boolean;
    gameEndedInSurrender: boolean;
+   holdingPings: number;
    getBackPings: number;
    goldEarned: number;
    goldSpent: number;
-   holdPings: number;
    individualPosition: string;
    inhibitorKills: number;
    inhibitorTakedowns: number;
@@ -112,15 +131,27 @@ export type ParticipantInformation = {
    magicDamageDealtToChampions: number;
    magicDamageTaken: number;
    missions: string[]; //TODO: Create a type for missions
-   needVisionPings: number;
    neutralMinionsKilled: number;
+   needVisionPings: number;
    nexusKills: number;
-   nexusLost: number;
    nexusTakedowns: number;
+   nexusLost: number;
    objectivesStolen: number;
    objectivesStolenAssists: number;
    onMyWayPings: number;
    participantId: number;
+   playerScore0: number;
+   playerScore1: number;
+   playerScore2: number;
+   playerScore3: number;
+   playerScore4: number;
+   playerScore5: number;
+   playerScore6: number;
+   playerScore7: number;
+   playerScore8: number;
+   playerScore9: number;
+   playerScore10: number;
+   playerScore11: number;
    pentaKills: number;
    perks: { //TODO: Create a type for perks
       statPerks: {
@@ -198,6 +229,30 @@ export type ParticipantInformation = {
    wardsKilled: number;
    wardsPlaced: number;
    win: boolean;
+}
+
+export type PerksDto = {
+   statPerks: PerkStatsDto;
+   styles: PerkStyleDto[];
+}
+
+export type PerkStatsDto = {
+   defense: number;
+   flex: number;
+   offense: number;
+}
+
+export type PerkStyleDto = {
+   description: string;
+   selections: PerkStyleSelectionDto[];
+   style: number;
+}
+
+export type PerkStyleSelectionDto = {
+   perk: number;
+   var1: number;
+   var2: number;
+   var3: number;
 }
 
 export type Ban = {

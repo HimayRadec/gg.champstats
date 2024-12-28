@@ -1,4 +1,4 @@
-import { AccountInformation, MatchInformation, SummonerProfile, SummonerSpell, SummonerSpells } from "@/types/LeagueOfLegends";
+import { AccountInformation, MatchDto, SummonerProfile, SummonerSpell, SummonerSpells } from "@/types/LeagueOfLegends";
 
 const LeagueAPIRoute = `/api/riot/LeagueOfLegends/`
 
@@ -75,7 +75,7 @@ export async function fetchMatchIdsByPUUID(puuid: string): Promise<string[]> {
 }
 
 // Fetches the match data using the match ID
-export async function fetchMatchByMatchID(matchId: string): Promise<MatchInformation> {
+export async function fetchMatchByMatchID(matchId: string): Promise<MatchDto> {
    try {
       const response = await fetch(`${LeagueAPIRoute}getMatchByMatchID?matchId=${matchId}`);
 

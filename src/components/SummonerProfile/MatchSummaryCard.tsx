@@ -27,20 +27,24 @@ Parent Component:
 //TODO: Add Rank and LP to the card
 //TODO: Calculate LP Gain/Loss
 //TODO: Fix matched game and time since game was played
-//TODO: Add links to summoner names on the cards
-//TODO: Remove data fetching from the component and pass it as props
 
 
 'use client'
 import Image from 'next/image'
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { fetchMatchByMatchID, fetchSummonerSpellsData, fetchRunesData } from '@/utils/formatApiData/fetchLeagueOfLegendsData';
-import { MatchInformation, ParticipantInformation, SummonerSpells, SummonerSpell, PerkData, Perk, RuneSlot, Rune } from '@/types/LeagueOfLegends';
+import { fetchSummonerSpellsData, fetchRunesData } from '@/utils/formatApiData/fetchLeagueOfLegendsData';
+import { MatchDto, ParticipantDto, SummonerSpells, SummonerSpell, PerkData, Perk, RuneSlot, Rune } from '@/types/LeagueOfLegends';
 
 const WIN_BACKGROUND_COLOR = '#12264a';
 const LOSS_BACKGROUND_COLOR = '#5e1515';
 
+/**
+ * 
+ * @param summonerSpellsData 
+ * @param summonerSpellKey 
+ * @returns 
+ */
 function getSummonerSpellByKey(summonerSpellsData: SummonerSpells, summonerSpellKey: number): SummonerSpell | undefined {
    for (const spellKey in summonerSpellsData.data) {
       if (summonerSpellsData.data[spellKey].key === summonerSpellKey.toString()) {
@@ -51,10 +55,22 @@ function getSummonerSpellByKey(summonerSpellsData: SummonerSpells, summonerSpell
 }
 
 
-// TODO: Lower runtime complexity? Doesnt really matter since the data is small but still good practice.
-// Returns Specific Runes. Example: Arcane Comet, Electrocute, Conqueror, etc.
+/**
+ * Finds and returns a specific rune (e.g., Arcane Comet, Electrocute, Conqueror) and its associated details.
+ * 
+ * This function searches for a rune by its `perkId`, `slotIndex`, and `runeId` in the provided `runesData` array.
+ * It returns the rune object containing its `id`, `key`, `icon`, `name`, `shortDesc`, and `longDesc`.
+ * 
+ * @param runesData - The data set containing all perk information and associated runes.
+ * @param perkId - The unique ID of the perk (e.g., Arcane Comet).
+ * @param slotIndex - The index of the slot containing the rune within the perk.
+ * @param runeId - The unique ID of the rune within the specified slot.
+ * 
+ * @returns The specific rune object if found, or `undefined` if no matching rune is found.
+ * 
+ * @todo Optimize runtime complexity by replacing the `find` method with a more efficient map-based approach.
+ */
 function findRune(runesData: PerkData, perkId: number, slotIndex: number, runeId: number): Rune | undefined {
-
    const perk = runesData!.find(p => p.id === perkId);
 
    if (perk && perk.slots[slotIndex]) {
@@ -192,7 +208,7 @@ function ParticipantChampionIconAndSummonerName(props: { championName: string, s
 
 
 function ExpandedParticipantInfo(props: {
-   participantStats: ParticipantInformation,
+   participantStats: ParticipantDto,
    runesData: PerkData,
    summonerSpellsData: SummonerSpells
    highestDamageInGame: number
@@ -297,13 +313,14 @@ function ExpandedParticipantInfo(props: {
 
 
 function ExpandedTeamOverview(props: {
-   participantsData: ParticipantInformation[],
-   summonerSpellsData: SummonerSpells,
+   highestDamageInGame: number,
+   colorSide: string,
+   participantsData: ParticipantDto[],
    runesData: PerkData,
-   highestDamageInGame: number
+   summonerSpellsData: SummonerSpells
 }) {
 
-   const { participantsData, highestDamageInGame } = props;
+   const { participantsData, highestDamageInGame, colorSide } = props;
 
    let backgroundColor = (participantsData[0].win ? WIN_BACKGROUND_COLOR : LOSS_BACKGROUND_COLOR);
    let textColor = (participantsData[0].win ? '#4287f5' : '#f54242');
@@ -314,7 +331,7 @@ function ExpandedTeamOverview(props: {
          <div className='TeamOverviewHeader grid grid-cols-8 bg-black bg-opacity-75 p-1'>
             <div className='col-span-2 flex gap-1 items-end'>
                <div className='text-sm ' style={{ color: textColor }}>{`${participantsData[0].win ? 'Victory' : 'Defeat'}`}</div>
-               <span className='text-sm'>(Blue Side)</span>
+               <span className='text-sm'>{colorSide}</span>
             </div>
             <div className='text-center'>KDA</div>
             <div className='text-center'>Damage</div>
@@ -341,7 +358,7 @@ function ExpandedTeamOverview(props: {
 }
 
 
-export function MatchSummaryCard(props: { matchData: MatchInformation, puuid: string }) {
+export function MatchSummaryCard(props: { matchData: MatchDto, puuid: string }) {
    const { matchData, puuid } = props;
    const [summonerIndex, setSummonerIndex] = useState<number>(0);
    const [loading, setLoading] = useState<boolean>(true);
@@ -349,15 +366,21 @@ export function MatchSummaryCard(props: { matchData: MatchInformation, puuid: st
    const [summonerSpellsData, setSummonerSpellsData] = useState<SummonerSpells>();
    const [runesData, setRuneData] = useState<PerkData>();
 
+   let queueType = matchData.info.queueId;
+
    useEffect(() => {
       const fetchData = async () => {
          try {
+
+            // Find the index of the searched summoner in the match data
             const summonerParticipantIndex = matchData.info.participants.findIndex((participant: any) => participant.puuid === puuid);
             setSummonerIndex(summonerParticipantIndex);
 
+            // Fetch the summoner spell and rune data
             const fetchedSummonerSpellData: SummonerSpells = await fetchSummonerSpellsData(matchData.info.gameVersion)
             setSummonerSpellsData(fetchedSummonerSpellData);
 
+            // Fetch the rune data
             const fetchedRuneData: PerkData = await fetchRunesData(matchData.info.gameVersion);
             setRuneData(fetchedRuneData);
          }
@@ -424,7 +447,8 @@ export function MatchSummaryCard(props: { matchData: MatchInformation, puuid: st
          >
 
             <div className='MatchInfo flex flex-col items-center w-max'>
-               <div>{matchData?.info.gameType}</div>
+               <div>{matchData?.info.queueId}</div>.
+               <div>{matchData?.info.participants[0].basicPings}</div>
                <div>{matchData?.info.gameEndTimestamp}</div>
                <div>{`${matchData?.info.participants[summonerIndex].win ? 'Win' : 'Loss'}`}</div>
                <div className='flex justify-center gap-x-2'>
@@ -513,17 +537,19 @@ export function MatchSummaryCard(props: { matchData: MatchInformation, puuid: st
          </div>
          <div className={`flex flex-col ${isExpanded ? '' : 'hidden'}`} style={{ backgroundColor: backgroundColor }}>
             <ExpandedTeamOverview
+               highestDamageInGame={highestDamageInGame!}
+               colorSide='Red Side'
                participantsData={matchData!.info.participants.slice(0, 5)}
                summonerSpellsData={summonerSpellsData!}
                runesData={runesData!}
-               highestDamageInGame={highestDamageInGame!}
             />
 
             <ExpandedTeamOverview
+               highestDamageInGame={highestDamageInGame!}
+               colorSide='Blue Side'
                participantsData={matchData!.info.participants.slice(5, 10)}
                summonerSpellsData={summonerSpellsData!}
                runesData={runesData!}
-               highestDamageInGame={highestDamageInGame!}
             />
 
          </div>

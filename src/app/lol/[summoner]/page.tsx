@@ -15,7 +15,7 @@ Example URL: champstats.gg/lol/radec%20himay-NA1
 
 import { useEffect, useState } from "react";
 import { fetchAccountByRiotID, fetchMatchIdsByPUUID, fetchMatchByMatchID } from "@/utils/formatApiData/fetchLeagueOfLegendsData";
-import { AccountInformation, MatchInformation } from "@/types/LeagueOfLegends";
+import { AccountInformation, MatchDto } from "@/types/LeagueOfLegends";
 import SummonerProfileComponent from "@/components/SummonerProfile/SummonerProfile";
 import { MatchSummaryCard } from "@/components/SummonerProfile/MatchSummaryCard";
 
@@ -25,7 +25,7 @@ export default function Page({ params }: { params: { summoner: string } }) {
 
    const [accountData, setAccountData] = useState<AccountInformation | null>(null);
    const [matchIds, setMatchIds] = useState<string[]>([]);
-   const [matchesData, setMatchesData] = useState<MatchInformation[]>([]);
+   const [matchesData, setMatchesData] = useState<MatchDto[]>([]);
 
    const [loading, setLoading] = useState<boolean>(true);
    const [error, setError] = useState<string | null>(null);
@@ -72,19 +72,62 @@ export default function Page({ params }: { params: { summoner: string } }) {
       <div className="flex flex-col border max-w-[1000px] m-auto">
          {accountData && (
             <>
-
                <div className="mb-2">
                   <SummonerProfileComponent accountData={accountData} />
                </div>
-               <div className="flex flex-col gap-y-1">
-                  {matchesData.map((match, index) => (
-                     <MatchSummaryCard
-                        key={match.info.gameId}
-                        matchData={match}
-                        puuid={accountData.puuid}
-                     />
-                  ))}
+               <div>
+
                </div>
+
+               <div className="bg-blue-500">
+                  Overview
+               </div>
+
+               <div className=" flex">
+
+                  <div className="flex flex-col">
+
+                     <div>
+                        Current Rank
+                     </div>
+
+                     <div>
+                        Flex Rank
+                     </div>
+
+                     <div>
+                        Champion Stats
+                     </div>
+
+                     <div>
+                        Recently Played Champions
+                     </div>
+
+                  </div>
+
+                  <div className="flex flex-col">
+
+                     <div>
+
+                     </div>
+
+                     <div>
+                        <div className="flex flex-col gap-y-1">
+                           {matchesData.map((match, index) => (
+                              <MatchSummaryCard
+                                 key={match.info.gameId}
+                                 matchData={match}
+                                 puuid={accountData.puuid}
+                              />
+                           ))}
+                        </div>
+                     </div>
+
+                  </div>
+
+               </div>
+
+
             </>
          )}
       </div>
